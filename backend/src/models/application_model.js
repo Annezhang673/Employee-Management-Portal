@@ -10,7 +10,6 @@ const applicationSchema = new mongoose.Schema({
    }],
    status:        { type: String, enum: ['Pending','Approved','Rejected'], default: 'Pending' },
    feedback:      { type: String },
-   submittedAt:   { type: Date, default: Date.now }
 }, {
    timestamps: true
 });
