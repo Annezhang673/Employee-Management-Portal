@@ -9,7 +9,8 @@ const userSchema = new mongoose.Schema({
    profilePicUrl: { type: String},   // user upload profile picture to AWS S3, and we store that link
    visaType:      { type: String, enum: ['None','OPT','H1B','Other'], default: 'None' },
    visaDocs:      [visaDocSchema],
-   house:         { type: mongoose.Schema.Types.ObjectId, ref: 'House' }
+   house:         { type: mongoose.Schema.Types.ObjectId, ref: 'House' },
+   application:   { type: mongoose.Schema.Types.ObjectId, ref: 'Application' } // refer to Application schema, and determine if we should redirect user to home page 
 }, {
    timestamps: true 
    /*
