@@ -4,7 +4,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 import registrationTokenRoutes from "./src/routes/registrationToken-route.js";
-import userRoutes from "./src/routes/userInfo-route.js";
 
 import uploadRoutes from "./src/routes/documentUpload-route.js";
 
@@ -15,8 +14,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use("/api/tokens", registrationTokenRoutes);
-
-app.use("/api/users", userRoutes);
 
 app.use("/api/documents", uploadRoutes);
 
