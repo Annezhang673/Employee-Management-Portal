@@ -4,6 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 import registrationTokenRoutes from "./src/routes/registrationToken-route.js";
+import userRoutes from "./src/routes/user-route.js";
 
 const app = express();
 dotenv.config();
@@ -14,6 +15,7 @@ app.use(express.json());
 
 
 app.use("/api/tokens", registrationTokenRoutes);
+app.use("/api/users", userRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
