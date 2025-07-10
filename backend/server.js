@@ -6,16 +6,18 @@ import dotenv from "dotenv";
 import registrationTokenRoutes from "./src/routes/registrationToken-route.js";
 import userRoutes from "./src/routes/user-route.js";
 
+import uploadRoutes from "./src/routes/documentUpload-route.js";
+
 const app = express();
 dotenv.config();
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-
-
 app.use("/api/tokens", registrationTokenRoutes);
 app.use("/api/users", userRoutes);
+
+app.use("/api/documents", uploadRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
