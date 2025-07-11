@@ -1,16 +1,16 @@
 import crypto from "crypto";
 import { sendRegistrationEmail } from "../utils/sendEmail.js";
-
+import RegistrationToken from "../models/RegistrationToken-model.js";
 
 export const generateAndSendToken = async (req, res) => {
   try {
     const { email } = req.body;
 
     const token = crypto.randomBytes(16).toString("hex");
-    // const expiresAt = new Date(Date.now() + 3 * 60 * 60 * 1000); // 3 hrs
+    const expiresAt = new Date(Date.now() + 3 * 60 * 60 * 1000); // 3 hrs
 
-    // const newToken = new RegistrationToken({ email, token, expiresAt });
-    // await newToken.save();
+    const newToken = new RegistrationToken({ email, token, expiresAt });
+    await newToken.save();
 
     const tokenLink = `http://localhost:3000/registration/${token}`;
     await sendRegistrationEmail(email, tokenLink);
@@ -21,7 +21,8 @@ export const generateAndSendToken = async (req, res) => {
   }
 };
 
-export const getToken = async (req, res) => {
+// validate token
+export const validateToken = async (req, res) => {
   try {
     const token = req.params.token;
 
@@ -34,5 +35,17 @@ export const getToken = async (req, res) => {
     res.status(200).json({ email: tokenDoc.email, valid: true });
   } catch (error) {
     res.status(500).json({ error: "Token validation failed" });
+  }
+};
+
+// view token usage history
+export const viewTokenStatus = async (req, res) => {
+  try {
+    const tokens = await RegistrationToken.find({});
+
+    res.status(200).json({ tokens });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
   }
 };
