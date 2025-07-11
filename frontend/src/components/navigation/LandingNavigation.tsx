@@ -1,6 +1,6 @@
 // using bootstrap
 import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.min.js";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { Link } from "react-router-dom";
 
 export default function LandingNavigation() {
@@ -15,8 +15,8 @@ export default function LandingNavigation() {
           className="navbar-toggler"
           type="button"
           data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
+          data-bs-target="#landingNavbar"
+          aria-controls="landingNavbar"
           aria-expanded="false"
           aria-label="Toggle navigation"
         >
@@ -25,7 +25,7 @@ export default function LandingNavigation() {
 
         <div
           className="collapse navbar-collapse justify-content-end"
-          id="navbarNav"
+          id="landingNavbar"
         >
           <ul className="navbar-nav gap-2">
             <li className="nav-item">
