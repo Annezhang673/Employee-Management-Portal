@@ -8,6 +8,7 @@ import DashboardPage from "./pages/DashboardPage";
 import ProfilePage from "./pages/ProfilePage";
 import FeaturePage from "./pages/featurePage";
 import AboutPage from "./pages/AboutPage";
+import RegistrationPage from "./pages/Registration";
 
 function App() {
   const router = createBrowserRouter([
@@ -28,6 +29,11 @@ function App() {
         { path: "dashboard", element: <DashboardPage /> },
         { path: "login", element: <ProfilePage /> },
       ],
+    },
+    // Register routes when employee click tokenLink
+    {
+      path: "/registration/:token",
+      element: <RegistrationPage />,
     },
   ]);
 
