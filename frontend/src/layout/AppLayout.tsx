@@ -2,6 +2,9 @@ import { Navigate, Outlet } from "react-router-dom";
 import HRNavigation from "../components/navigation/HRNavigation";
 import EmployeeNavigation from "../components/navigation/EmployeeNavigation";
 
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
+
 const getUser = () => {
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
