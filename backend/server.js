@@ -3,12 +3,10 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 import { connectDB } from "./src/lib/db.js";
-
-
 import registrationTokenRoutes from "./src/routes/registrationToken-route.js";
-import userRoutes from "./src/routes/user-route.js";
+import housingRoutes from "./src/routes/housing-route.js";
+import uploadDocumentRoutes from "./src/routes/documentUpload-route.js";
 
-import uploadRoutes from "./src/routes/documentUpload-route.js";
 
 const app = express();
 dotenv.config();
@@ -17,9 +15,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use("/api/tokens", registrationTokenRoutes);
-app.use("/api/users", userRoutes);
+app.use("./api/housing", housingRoutes);
+app.use("/api/documents", uploadDocumentRoutes);
 
-app.use("/api/documents", uploadRoutes);
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
