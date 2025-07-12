@@ -11,10 +11,14 @@ export const fetchOnboarding = createAsyncThunk(
 
 export const submitOnboarding = createAsyncThunk(
   "onboarding/submit",
-  async (formData: any) => {
+  async (formData: FormData) => {
     const res = await axios.post(
       "http://localhost:8080/api/onboarding",
-      formData
+      formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
     );
     return res.data;
   }

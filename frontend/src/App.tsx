@@ -11,6 +11,7 @@ import AboutPage from "./pages/AboutPage";
 import RegistrationPage from "./pages/Registration";
 import { Toaster } from "react-hot-toast";
 import OnboardingPage from "./pages/OnboardingPage";
+import OnboardingStatus from "./pages/OnboardingStatus";
 
 function App() {
   const router = createBrowserRouter([
@@ -30,7 +31,13 @@ function App() {
       children: [
         { path: "dashboard", element: <DashboardPage /> },
         { path: "login", element: <ProfilePage /> },
-        { path: "onboarding", element: <OnboardingPage /> },
+        {
+          path: "onboarding",
+          children: [
+            { index: true, element: <OnboardingPage /> },
+            { path: "status", element: <OnboardingStatus /> },
+          ],
+        },
       ],
     },
     // Register routes when employee click tokenLink
