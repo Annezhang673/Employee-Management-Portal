@@ -9,6 +9,7 @@ import ProfilePage from "./pages/ProfilePage";
 import FeaturePage from "./pages/featurePage";
 import AboutPage from "./pages/AboutPage";
 import RegistrationPage from "./pages/Registration";
+import HiringManagementPage from './pages/HiringManagementPage';
 
 function App() {
   const router = createBrowserRouter([
@@ -26,8 +27,9 @@ function App() {
       path: "/app",
       element: <AppLayout />,
       children: [
-        { path: "dashboard", element: <DashboardPage /> },
-        { path: "login", element: <ProfilePage /> },
+        { path: "dashboard",  element: <DashboardPage /> },
+        { path: "login",      element: <ProfilePage /> },
+        { path: "hiring",     element: <HiringManagementPage /> },
       ],
     },
     // Register routes when employee click tokenLink
