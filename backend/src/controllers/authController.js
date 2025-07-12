@@ -43,9 +43,8 @@ export const registerUser = async (req, res) => {
 
     // Create user
     const newUser = new User({
-    //   userName,
-      userName: username,
-      email,
+      userName: userName,
+      email: email,
       password: hashedPassword,
       house: assignedHouse._id,
     //   role: 'employee',
@@ -65,10 +64,7 @@ export const registerUser = async (req, res) => {
     };
 
     const authToken = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-
-
     res.status(201).json({ message: 'User registered successfully' });
-
   } catch (err) {
     console.error('Registration error:', err);
     res.status(500).json({ message: 'Server error' });
