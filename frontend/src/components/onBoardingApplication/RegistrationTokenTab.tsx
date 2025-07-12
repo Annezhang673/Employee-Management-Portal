@@ -54,7 +54,7 @@ export default function RegistrationTokenTab() {
    return (
       <div>
          <h2>Generate Registration Token</h2>
-         <form onClick={handleSubmit} className='mb-4'>
+         <form className='mb-4' onSubmit={e => e.preventDefault()}>
             <div className="input-group">
                <input 
                   type='email' 
@@ -65,7 +65,7 @@ export default function RegistrationTokenTab() {
                   required
                />
 
-               <button className='btn btn-primary' disabled={loading}>
+               <button type='button' className='btn btn-primary' disabled={loading} onClick={handleSubmit}>
                   {loading ? 'Sending' : 'Generate'}
                </button>
             </div>
