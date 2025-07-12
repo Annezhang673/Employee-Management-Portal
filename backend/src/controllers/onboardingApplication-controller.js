@@ -47,16 +47,25 @@ export const submitOnboardingApplication = async (req, res) => {
   }
 };
 
-// get current onboarding application for user
+// get current latest onboarding application for user
 export const viewOnboardingApplication = async (req, res) => {
   try {
     const userId = req?.user?._id || "6871ea0ed0419f9413b9f685";
 
-    const application = await Application.findOne({ user: userId });
+    const application = await Application.find({ user: userId });
+
+    // if mutiple application submit by same user, getting the lastest one
+    if (application.length > 1) {
+      application.sort((a, b) => {
+        return b.createdAt - a.createdAt;
+      });
+    }
 
     if (!application) {
       return res.status(404).json({ error: "Application not found" });
     }
+
+    res.status(200).json(application[0]);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });
