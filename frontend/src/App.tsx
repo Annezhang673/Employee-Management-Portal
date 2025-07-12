@@ -11,7 +11,6 @@ import AboutPage from "./pages/AboutPage";
 import RegistrationPage from "./pages/Registration";
 import HiringManagementPage from './pages/HiringManagementPage';
 
-
 function App() {
   const router = createBrowserRouter([
     {
@@ -38,7 +37,6 @@ function App() {
       path: "/registration/:token",
       element: <RegistrationPage />,
     },
-
   ]);
 
   return (
