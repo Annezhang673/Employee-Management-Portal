@@ -9,6 +9,8 @@ import ProfilePage from "./pages/ProfilePage";
 import FeaturePage from "./pages/featurePage";
 import AboutPage from "./pages/AboutPage";
 import RegistrationPage from "./pages/Registration";
+import { Toaster } from "react-hot-toast";
+import OnboardingPage from "./pages/OnboardingPage";
 
 function App() {
   const router = createBrowserRouter([
@@ -28,6 +30,7 @@ function App() {
       children: [
         { path: "dashboard", element: <DashboardPage /> },
         { path: "login", element: <ProfilePage /> },
+        { path: "onboarding", element: <OnboardingPage /> },
       ],
     },
     // Register routes when employee click tokenLink
@@ -40,6 +43,7 @@ function App() {
   return (
     <>
       <RouterProvider router={router} />
+      <Toaster />
     </>
   );
 }
