@@ -46,3 +46,7 @@ export const submitOnboardingApplication = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const viewOnboardingApplication = async (req, res) => {};
+
+export const updateOnboardingApplication = async (req, res) => {};

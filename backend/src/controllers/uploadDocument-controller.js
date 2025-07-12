@@ -1,4 +1,5 @@
 import { uploadFileToS3 } from "../lib/s3.js";
+import Application from "../models/application_model.js";
 
 // Post /api/documents/upload
 // expect a single file, folder = "documents", userId in req.user
@@ -15,15 +16,17 @@ export const uploadDocuments = async (req, res) => {
 
     const result = await uploadFileToS3(req.file, `documents/${documentType}`, userId);
 
-    // might need to modified user schema by adding a documents array
-    // const user = await User.findById(req.user._id);
-    // user.documents.push({
-    //   name: documentType,
-    //   fileUrl: result.url,
-    //   uploadedAt: new Date(),
-    // })
+    const application = await Application.findOne({ userId });
+    if (!application) {
+      return res.status(404).json({ error: "Application not found" });
+    }
 
-    // await user.save();
+    application.documents.push({
+      name: req.file.originalname,
+      s3Key: result.key,
+      url: result.url,
+    });
+    await application.save();
 
     res.status(200).json({
       message: "File uploaded successfully",
