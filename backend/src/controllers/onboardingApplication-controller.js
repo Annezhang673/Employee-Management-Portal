@@ -47,6 +47,58 @@ export const submitOnboardingApplication = async (req, res) => {
   }
 };
 
-export const viewOnboardingApplication = async (req, res) => {};
+// get current onboarding application for user
+export const viewOnboardingApplication = async (req, res) => {
+  try {
+    const userId = req?.user?._id || "6871ea0ed0419f9413b9f685";
 
-export const updateOnboardingApplication = async (req, res) => {};
+    const application = await Application.findOne({ user: userId });
+
+    if (!application) {
+      return res.status(404).json({ error: "Application not found" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// update the onboarding application if needed, or reject by HR
+export const updateOnboardingApplication = async (req, res) => {
+  try {
+    const userId = req?.user?._id || "6871ea0ed0419f9413b9f685";
+
+    const application = await Application.findOne({ user: userId });
+
+    if (!application) {
+      return res.status(404).json({ error: "Application not found" });
+    }
+
+    if (req.body.data) {
+      application.data = req.body.data;
+    }
+
+    if (req.files.length > 0) {
+      const documents = await Promise.all(
+        req.files.map(async (file) => {
+          const s3Upload = await uploadFileToS3(file, "documents", userId);
+
+          return {
+            name: file.fieldname, // profilePic, etc.
+            s3Key: s3Upload.key,
+            url: s3Upload.url,
+          };
+        })
+      );
+
+      application.documents.push(...documents);
+    }
+
+    await application.save();
+
+    res.status(200).json(application);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+};

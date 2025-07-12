@@ -9,9 +9,10 @@ import ProfilePage from "./pages/ProfilePage";
 import FeaturePage from "./pages/featurePage";
 import AboutPage from "./pages/AboutPage";
 import RegistrationPage from "./pages/Registration";
-import { Toaster } from "react-hot-toast";
+import HiringManagementPage from "./pages/HiringManagementPage";
 import OnboardingPage from "./pages/OnboardingPage";
 import OnboardingStatus from "./pages/OnboardingStatus";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const router = createBrowserRouter([
@@ -31,6 +32,7 @@ function App() {
       children: [
         { path: "dashboard", element: <DashboardPage /> },
         { path: "login", element: <ProfilePage /> },
+        { path: "hiring", element: <HiringManagementPage /> },
         {
           path: "onboarding",
           children: [
