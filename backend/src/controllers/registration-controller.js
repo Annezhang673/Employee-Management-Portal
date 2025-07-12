@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { sendRegistrationEmail } from "../utils/sendEmail.js";
-import RegistrationToken from "../models/RegistrationToken-model.js";
+import RegistrationToken from "../models/registrationToken-model.js";
 
 export const generateAndSendToken = async (req, res) => {
   try {
