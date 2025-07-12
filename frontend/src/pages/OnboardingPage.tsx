@@ -19,8 +19,7 @@ export default function OnboardingPage() {
 
   const submitted = useSelector((state: RootState) => state.onboarding.submitted);
 
-  // check if current user already submitted, if so, make submitted state true
-  // need user slice to do the rest
+  
 
 
   const [formData, setFormData] = useState({
