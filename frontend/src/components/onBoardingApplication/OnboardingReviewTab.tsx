@@ -34,19 +34,19 @@ export default function OnboardingReviewTab() {
    }, []);
 
    async function fetchBucket(status: string, setter: (data: AppRow[]) => void) {
-      const res = await axios.get<AppRow[]>('/api/hiring/review', { params: { status } });
+      const res = await axios.get<AppRow[]>('http://localhost:8080/api/hiring/review', { params: { status } });
       setter(res.data);
    }
 
    async function handleApprove(appId: string) {
-      await axios.put(`/api/hiring/review/${appId}/approve`);
+      await axios.put(`http://localhost:8080/api/hiring/review/${appId}/approve`);
       setPending(p => p.filter(a => a.appId !== appId));
       fetchBucket('Approved', setApproved);
    }
 
    async function handleReject(appId: string) {
       const feedback = prompt('Rejection feedback:') || '';
-      await axios.put(`/api/hiring/review/${appId}/reject`, { feedback });
+      await axios.put(`http://localhost:8080/api/hiring/review/${appId}/reject`, { feedback });
       setPending(p => p.filter(a => a.appId !== appId));
       fetchBucket('Rejected', setRejected);
    }
