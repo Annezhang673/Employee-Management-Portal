@@ -23,7 +23,7 @@ export default function OnboardingStatus() {
   }, [dispatch]);
 
   return (
-    <>
+    <div className="container p-4 text-primary">
       {applicationStatus?.toLowerCase() === "pending" && (
         <div className="alert alert-info text-center">
           <h4>Waiting for HR approval</h4>
@@ -49,6 +49,6 @@ export default function OnboardingStatus() {
           </div>
         </>
       )}
-    </>
+    </div>
   );
 }
