@@ -218,9 +218,9 @@ export default function OnboardingPage() {
   }
 
   return (
-    <>
+    <div className="container-fluid">
       {submitted && applicationStatus?.toLowerCase() === "pending" && (
-        <div className="container my-3">
+        <div className="my-3">
           <div className="alert alert-success" role="alert">
             Onboarding application submitted successfully!
           </div>
@@ -232,7 +232,7 @@ export default function OnboardingPage() {
       )}
       {(!submitted || applicationStatus?.toLowerCase() === "rejected") && (
         <div
-          className="container-fluid"
+          className="mt-3 bg-light rounded text-start p-3"
           style={{
             maxHeight: "100%",
             overflow: "auto",
@@ -240,10 +240,10 @@ export default function OnboardingPage() {
           }}
         >
           <h2 className="text-center fw-bold">Onboarding Application</h2>
-          <hr />
+          <hr className="dark"/>
 
           <form
-            className="needs-validation container my-3 bg-light p-3 shadow"
+            className="needs-validation container my-3 bg-primary p-3 shadow"
             onSubmit={handleSubmit}
           >
             <>
@@ -1048,6 +1048,6 @@ export default function OnboardingPage() {
           </form>
         </div>
       )}
-    </>
+    </div>
   );
 }
