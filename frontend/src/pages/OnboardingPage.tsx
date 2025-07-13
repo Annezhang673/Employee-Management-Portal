@@ -17,12 +17,6 @@ export default function OnboardingPage() {
   const navigate = useNavigate();
 
   const applicationStatus = (onboarding.onboarding as any)?.status;
-
-  const [showProfilePic, setShowProfilePic] = useState(false);
-  const [showOptReceipt, setShowOptReceipt] = useState(false);
-  const [showWorkAuthorization, setShowWorkAuthorization] = useState(false);
-  const [showDriverLicenseFile, setShowDriverLicenseFile] = useState(false);
-
   const [documentURLs, setDocumentURLs] = useState<{ [key: string]: string }>(
     {}
   );
@@ -41,6 +35,14 @@ export default function OnboardingPage() {
     const applicatonStatus = (onboarding.onboarding as any)?.status;
     if (submitted && applicatonStatus?.toLowerCase() === "approved") {
       navigate(`/app/dashboard`);
+    }
+    if (submitted && applicatonStatus?.toLowerCase() === "rejected") {
+      const hasSeenRejection = sessionStorage.getItem("hasSeenRejection");
+
+      if (!hasSeenRejection) {
+        sessionStorage.setItem("hasSeenRejection", "true");
+        navigate(`/app/onboarding/status`);
+      }
     }
   }, [submitted, navigate, onboarding]);
 
@@ -207,6 +209,8 @@ export default function OnboardingPage() {
       dispatch(fetchOnboarding()); // Refetch the onboarding data
       toast.success("Onboarding application submitted successfully!");
     });
+
+    sessionStorage.removeItem("hasSeenRejection");
   };
 
   if (onboarding.status === "loading") {
