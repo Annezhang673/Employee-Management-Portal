@@ -5,14 +5,18 @@ import RootLayout from "./layout/RootLayout";
 import LoginPage from "./pages/LoginPage";
 import AppLayout from "./layout/AppLayout";
 import DashboardPage from "./pages/DashboardPage";
-import ProfilePage from "./pages/ProfilePage";
+import ProfilePage from "./pages/Employee/ProfilePage";
 import FeaturePage from "./pages/featurePage";
 import AboutPage from "./pages/AboutPage";
 import RegistrationPage from "./pages/Registration";
-import HiringManagementPage from "./pages/HiringManagementPage";
 import OnboardingPage from "./pages/OnboardingPage";
 import OnboardingStatus from "./pages/OnboardingStatus";
 import { Toaster } from "react-hot-toast";
+import VisaStatusPage from "./pages/Employee/VisaStatusPage";
+import HousingPage from "./pages/Employee/HousingPage";
+import HousingManagementPage from "./pages/HR/HousingManagementPage";
+import EmployeeManagementPage from "./pages/HR/EmployeeManagementPage";
+import HiringManagementPage from "./pages/HR/HiringManagementPage";
 
 function App() {
   const router = createBrowserRouter([
@@ -31,8 +35,7 @@ function App() {
       element: <AppLayout />,
       children: [
         { path: "dashboard", element: <DashboardPage /> },
-        { path: "login", element: <ProfilePage /> },
-        { path: "hiring", element: <HiringManagementPage /> },
+        { path: "profile", element: <ProfilePage /> },
         {
           path: "onboarding",
           children: [
@@ -40,6 +43,14 @@ function App() {
             { path: "status", element: <OnboardingStatus /> },
           ],
         },
+        // Employee routes
+        { path: "visa", element: <VisaStatusPage /> },
+        {path: "housing", element: <HousingPage />},
+
+        // HR routes
+        {path: "employeemanagement", element: <EmployeeManagementPage />},
+        {path: 'visamanagement', element: <HiringManagementPage />},
+        {path: "housingmanagement", element: <HousingManagementPage />},
       ],
     },
     // Register routes when employee click tokenLink

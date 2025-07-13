@@ -1,9 +1,14 @@
 // using bootstrap
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export default function LandingNavigation() {
+  const location = useLocation();
+
+  const isActive = (path: string) =>
+    location.pathname === path ? "active" : "";
+
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary bg-light shadow-sm">
       <div className="container-fluid">
@@ -29,17 +34,20 @@ export default function LandingNavigation() {
         >
           <ul className="navbar-nav gap-2">
             <li className="nav-item">
-              <Link to="/" className="nav-link active">
+              <Link to="/" className={`nav-link ${isActive("/")}`}>
                 Home
               </Link>
             </li>
             <li className="nav-item">
-              <Link to="/features" className="nav-link">
+              <Link
+                to="/features"
+                className={`nav-link ${isActive("/features")}`}
+              >
                 Features
               </Link>
             </li>
             <li className="nav-item">
-              <Link to="/about" className="nav-link">
+              <Link to="/about" className={`nav-link ${isActive("/about")}`}>
                 About
               </Link>
             </li>
