@@ -12,6 +12,9 @@ export default function OnboardingStatus() {
 
   const dispatch = useDispatch<AppDispatch>();
   const onboarding = useSelector((state: RootState) => state.onboarding);
+  // getting feedback if any
+
+  const feedback = (onboarding.onboarding as any)?.feedback;
 
   const applicationStatus = (onboarding.onboarding as any)?.status;
 
@@ -30,6 +33,12 @@ export default function OnboardingStatus() {
         <>
           <div className="alert alert-danger text-center">
             <h4>Application Rejected</h4>
+            <div className="mt-3 bg-light rounded text-start p-3">
+              <p>
+                <span className="fw-bold">Feedback from HR: </span>
+                {feedback}
+              </p>
+            </div>
           </div>
           <div className="d-block">
             <Link to="/app/onboarding">

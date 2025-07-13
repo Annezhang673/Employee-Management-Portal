@@ -6,7 +6,7 @@ const applicationSchema = new mongoose.Schema({
    documents:     [{
       name:          { type: String, required: true },
       s3Key:         { type: String, required: true },
-      url:           { type: String, required: true }
+      url:           { type: String, required: false }
    }],
    status:        { type: String, enum: ['Pending','Approved','Rejected'], default: 'Pending' },
    feedback:      { type: String },
