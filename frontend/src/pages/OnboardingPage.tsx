@@ -12,6 +12,80 @@ import FilePreviewItem from "../components/onBoardingApplication/FilePreviewItem
 import { PreviousFilePreview } from "../components/onBoardingApplication/PreviousFilePreview";
 import EmergencyContactFormList from "../components/onBoardingApplication/EmergencyContactFormList";
 
+
+// adding all file from formData
+export type EmergencyContact = {
+  firstName: string;
+  lastName: string;
+  middleName: string;
+  phone: string;
+  email: string;
+  relationship: string;
+};
+
+export type Referral = {
+  firstName: string;
+  lastName: string;
+  middleName: string;
+  phone: string;
+  email: string;
+  relationship: string;
+};
+
+export type Address = {
+  building: string;
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+};
+
+export type Car = {
+  make: string;
+  model: string;
+  color: string;
+};
+
+export type VisaInfo = {
+  type: string;
+  optReceipt: File | null;
+  otherVisaTitle: string;
+  startDate: string;
+  endDate: string;
+  file: File | null;
+  workAuthorization: File | null;
+};
+
+export type UserInfo = {
+  firstName: string;
+  lastName: string;
+  middleName: string;
+  preferredName: string;
+  profilePic: File | null;
+
+  address: Address;
+  cellPhone: string;
+  workPhone: string;
+
+  car: Car;
+  email: string;
+  ssn: string;
+  dob: string;
+  gender: string;
+  isCitizenOrPR: "" | "yes" | "no";
+  citizenstatus: "" | "Green Card" | "Citizen";
+  visa: VisaInfo;
+
+  hasDriverLicense: boolean;
+  driverLicenseNumber: string;
+  driverLicenseExpirationDate: string;
+  driverLicenseFile: File | null;
+
+  referral: Referral;
+  emergencyContact: EmergencyContact[];
+};
+
+
 export default function OnboardingPage() {
   const dispatch = useDispatch<AppDispatch>();
   const onboarding = useSelector((state: RootState) => state.onboarding);
@@ -47,7 +121,7 @@ export default function OnboardingPage() {
     }
   }, [submitted, navigate, onboarding]);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<UserInfo>({
     firstName: "",
     lastName: "",
     middleName: "",

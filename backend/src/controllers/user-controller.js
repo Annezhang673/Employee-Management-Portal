@@ -1,13 +1,23 @@
 import User from "../models/user_model.js";
+import Application from "../models/application_model.js";
 
 // Get api/users/me
 export const getUserProfile = async (req, res) => {
   try {
     // getting the user id from mongoose User Schema
-    const userId = req.user._id;
+    const userId = req?.user?._id || req.query.userId;
     const user = await User.findById(userId);
 
-    res.status(200).json(user);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const applicationId = user.application;
+    // populate the applications field
+    const application = await Application.find({ _id: applicationId });
+    user.application = application;
+
+    res.status(200).json({ user, application });
   } catch (error) {
     console.log("Unable to get user profile", error);
     res.status(500).json({ error: "Unable to get user profile", error });
