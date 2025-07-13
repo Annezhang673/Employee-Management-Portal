@@ -18,12 +18,14 @@ import HousingManagementPage from "./pages/HR/HousingManagementPage";
 import EmployeeManagementPage from "./pages/HR/EmployeeManagementPage";
 import HiringManagementPage from "./pages/HR/HiringManagementPage";
 import VisaStatusManagementPage from "./pages/HR/VisaStatusManagementPage";
+import ErrorPage from "./pages/ErrorPage";
 
 function App() {
   const router = createBrowserRouter([
     {
       path: "/",
       element: <RootLayout />,
+      errorElement: <ErrorPage />,
       children: [
         { index: true, element: <LandingPage /> },
         { path: "login", element: <LoginPage /> },
@@ -34,6 +36,7 @@ function App() {
     {
       path: "/app",
       element: <AppLayout />,
+      errorElement: <ErrorPage />,
       children: [
         { path: "dashboard", element: <DashboardPage /> },
         { path: "profile", element: <ProfilePage /> },
