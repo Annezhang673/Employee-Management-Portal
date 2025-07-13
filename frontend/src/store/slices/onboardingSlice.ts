@@ -61,8 +61,9 @@ const onboardingSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message ?? null;
       })
-      .addCase(submitOnboarding.fulfilled, (state) => {
+      .addCase(submitOnboarding.fulfilled, (state, action) => {
         state.submitted = true;
+        state.onboarding = action.payload;
       });
   },
 });

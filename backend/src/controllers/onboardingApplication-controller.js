@@ -1,5 +1,5 @@
 import Application from "../models/application_model.js";
-import { uploadFileToS3 } from "../lib/s3.js";
+import { getSignedFileURL, uploadFileToS3 } from "../lib/s3.js";
 
 // api/onboarding
 export const submitOnboardingApplication = async (req, res) => {
@@ -22,25 +22,58 @@ export const submitOnboardingApplication = async (req, res) => {
       return res.status(400).json({ error: "Invalid data format" });
     }
 
-    const documents = await Promise.all(
-      req.files.map(async (file) => {
-        const s3Upload = await uploadFileToS3(file, "documents", userId);
+    const existingApplication = await Application.findOne({ user: userId });
 
+    const uploadedDocs = await Promise.all(
+      (req.files || []).map(async (file) => {
+        const s3Upload = await uploadFileToS3(file, "documents", userId);
         return {
           name: file.fieldname, // profilePic, etc.
           s3Key: s3Upload.key,
-          url: s3Upload.url,
         };
       })
     );
 
-    const application = await Application.create({
-      user: userId,
-      data: parseData,
-      documents,
-    });
+    let mergedDocuments = uploadedDocs;
+    if (existingApplication?.documents?.length) {
+      const existingDocsMap = new Map();
 
-    res.status(201).json(application);
+      existingApplication.documents.forEach((doc) => {
+        existingDocsMap.set(doc.name, doc);
+      });
+
+      uploadedDocs.forEach((doc) => {
+        existingDocsMap.set(doc.name, doc);
+      });
+
+      // Reconstruct the documents array
+      mergedDocuments = Array.from(existingDocsMap.values());
+    }
+
+    const updatedApp = await Application.findOneAndUpdate(
+      { user: userId },
+      {
+        user: userId,
+        data: parseData,
+        documents: mergedDocuments,
+      },
+      { upsert: true, new: true }
+    );
+
+    const signedDocuments = await Promise.all(
+      updatedApp.documents.map(async (doc) => {
+        const signedUrl = await getSignedFileURL(doc.s3Key);
+        return {
+          ...doc.toObject(),
+          url: signedUrl,
+        };
+      })
+    );
+
+    res.status(201).json({
+      ...updatedApp._doc,
+      documents: signedDocuments,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });
@@ -65,7 +98,20 @@ export const viewOnboardingApplication = async (req, res) => {
       return res.status(404).json({ error: "Application not found" });
     }
 
-    res.status(200).json(application[0]);
+    const signedDocuments = await Promise.all(
+      application[0].documents.map(async (doc) => {
+        const signedUrl = await getSignedFileURL(doc.s3Key);
+        return {
+          ...doc.toObject(),
+          url: signedUrl,
+        };
+      })
+    );
+
+    res.status(200).json({
+      ...application[0]._doc,
+      documents: signedDocuments,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });
@@ -84,28 +130,51 @@ export const updateOnboardingApplication = async (req, res) => {
     }
 
     if (req.body.data) {
-      application.data = req.body.data;
+      application.data =
+        typeof req.body.data === "string"
+          ? JSON.parse(req.body.data)
+          : req.body.data;
     }
 
     if (req.files.length > 0) {
       const documents = await Promise.all(
         req.files.map(async (file) => {
-          const s3Upload = await uploadFileToS3(file, "documents", userId);
+          const { key } = await uploadFileToS3(file, "documents", userId);
 
           return {
             name: file.fieldname, // profilePic, etc.
-            s3Key: s3Upload.key,
-            url: s3Upload.url,
+            s3Key: key,
           };
         })
       );
 
-      application.documents.push(...documents);
+      const docMap = new Map();
+      application.documents.forEach((doc) => {
+        docMap.set(doc.name, doc);
+      });
+      documents.forEach((doc) => {
+        docMap.set(doc.name, doc);
+      });
+
+      application.documents = Array.from(docMap.values());
     }
 
     await application.save();
 
-    res.status(200).json(application);
+    const signedDocuments = await Promise.all(
+      application.documents.map(async (doc) => {
+        const signedUrl = await getSignedFileURL(doc.s3Key);
+        return {
+          ...doc.toObject(),
+          url: signedUrl,
+        };
+      })
+    );
+
+    res.status(200).json({
+      ...application._doc,
+      documents: signedDocuments,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });

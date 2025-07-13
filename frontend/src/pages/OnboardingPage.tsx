@@ -8,6 +8,8 @@ import {
 import GeneralLoading from "../components/skeletons/GeneralLoading";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
+import FilePreviewItem from "../components/onBoardingApplication/FilePreviewItem";
+import { PreviousFilePreview } from "../components/onBoardingApplication/PreviousFilePreview";
 
 export default function OnboardingPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -20,6 +22,10 @@ export default function OnboardingPage() {
   const [showOptReceipt, setShowOptReceipt] = useState(false);
   const [showWorkAuthorization, setShowWorkAuthorization] = useState(false);
   const [showDriverLicenseFile, setShowDriverLicenseFile] = useState(false);
+
+  const [documentURLs, setDocumentURLs] = useState<{ [key: string]: string }>(
+    {}
+  );
 
   const submitted = useSelector(
     (state: RootState) => state.onboarding.submitted
@@ -106,6 +112,17 @@ export default function OnboardingPage() {
 
   useEffect(() => {
     if ((onboarding.onboarding as any)?.data && !submitted) return;
+
+    // maping documents
+    const docs = (onboarding.onboarding as any).documents || [];
+    const documentMap: { [key: string]: string } = {};
+    docs.forEach((doc: any) => {
+      if (doc.url) {
+        documentMap[doc.name] = doc.url;
+      }
+    });
+    setDocumentURLs(documentMap);
+
     if ((onboarding.onboarding as any)?.data) {
       const {
         firstName,
@@ -186,82 +203,11 @@ export default function OnboardingPage() {
     if (driverLicenseFile)
       submission.append("driverLicenseFile", driverLicenseFile);
 
-    // dispatch(submitOnboarding(submission));
     dispatch(submitOnboarding(submission)).then(() => {
       dispatch(fetchOnboarding()); // Refetch the onboarding data
       toast.success("Onboarding application submitted successfully!");
     });
-    // clear the form
-    // clearForm();
   };
-
-  // const clearForm = () => {
-  //   setFormData({
-  //     firstName: "",
-  //     lastName: "",
-  //     middleName: "",
-  //     preferredName: "",
-  //     profilePic: null,
-
-  //     address: {
-  //       building: "",
-  //       street: "",
-  //       city: "",
-  //       state: "",
-  //       zip: "",
-  //     },
-
-  //     cellPhone: "",
-  //     workPhone: "",
-
-  //     car: {
-  //       make: "",
-  //       model: "",
-  //       color: "",
-  //     },
-
-  //     email: "", // pre-filled
-  //     ssn: "",
-  //     dob: "",
-  //     gender: "",
-  //     isCitizenOrPR: "" as "" | "yes" | "no",
-  //     citizenstatus: "" as "" | "Green Card" | "Citizen",
-  //     visa: {
-  //       type: "",
-  //       optReceipt: null,
-  //       otherVisaTitle: "",
-  //       startDate: "",
-  //       endDate: "",
-  //       file: null,
-  //       workAuthorization: null,
-  //     },
-
-  //     hasDriverLicense: false,
-  //     driverLicenseNumber: "",
-  //     driverLicenseExpirationDate: "",
-  //     driverLicenseFile: null,
-
-  //     referral: {
-  //       firstName: "",
-  //       lastName: "",
-  //       middleName: "",
-  //       phone: "",
-  //       email: "",
-  //       relationship: "",
-  //     },
-
-  //     emergencyContact: [
-  //       {
-  //         firstName: "",
-  //         lastName: "",
-  //         middleName: "",
-  //         phone: "",
-  //         email: "",
-  //         relationship: "",
-  //       },
-  //     ],
-  //   });
-  // };
 
   if (onboarding.status === "loading") {
     return <GeneralLoading />;
@@ -1045,91 +991,47 @@ export default function OnboardingPage() {
               <div className="mb-4">
                 <h5>Uploaded Files</h5>
                 <ul className="list-group">
-                  {formData.profilePic && (
-                    <li
-                      key={formData.profilePic.name}
-                      className="list-group-item cursor-pointer"
-                      onClick={() => setShowProfilePic((prev) => !prev)}
-                    >
-                      Profile Picture: {formData.profilePic.name}
-                      <div
-                        className={`collapse ${
-                          showProfilePic ? "show" : ""
-                        } mt-2`}
-                      >
-                        <img
-                          src={URL.createObjectURL(formData.profilePic)}
-                          alt="Profile"
-                          className="img-thumbnail"
-                        />
-                      </div>
-                    </li>
-                  )}
-                  {formData.driverLicenseFile && (
-                    <li
-                      className="list-group-item cursor-pointer"
-                      key={formData.driverLicenseFile.name}
-                      onClick={() => {
-                        setShowDriverLicenseFile((prev) => !prev);
-                      }}
-                    >
-                      Driver License: {formData.driverLicenseFile.name}
-                      <div
-                        className={`collapse ${
-                          showDriverLicenseFile ? "show" : ""
-                        } mt-2`}
-                      >
-                        <img
-                          src={URL.createObjectURL(formData.driverLicenseFile)}
-                          alt="Driver License"
-                          className="img-thumbnail"
-                        />
-                      </div>
-                    </li>
-                  )}
-                  {formData.visa.workAuthorization && (
-                    <li
-                      className="list-group-item cursor-pointer"
-                      key={formData.visa.workAuthorization.name}
-                      onClick={() => setShowWorkAuthorization((prev) => !prev)}
-                    >
-                      Work Auth: {formData.visa.workAuthorization.name}
-                      <div
-                        className={`collapse ${
-                          showWorkAuthorization ? "show" : ""
-                        } mt-2`}
-                      >
-                        <img
-                          src={URL.createObjectURL(
-                            formData.visa.workAuthorization
-                          )}
-                          alt="Work Authorization"
-                          className="img-thumbnail"
-                        />
-                      </div>
-                    </li>
-                  )}
-                  {formData.visa.optReceipt && (
-                    <li
-                      className="list-group-item cursor-pointer"
-                      key={formData.visa.optReceipt.name}
-                      onClick={() => setShowOptReceipt((prev) => !prev)}
-                    >
-                      OPT Receipt: {formData.visa.optReceipt.name}
-                      <div
-                        className={`collapse ${
-                          showOptReceipt ? "show" : ""
-                        } mt-2`}
-                      >
-                        <img
-                          src={URL.createObjectURL(formData.visa.optReceipt)}
-                          alt="OPT Receipt"
-                          className="img-thumbnail"
-                        />
-                      </div>
-                    </li>
-                  )}
+                  <FilePreviewItem
+                    label="Profile Picture"
+                    file={formData.profilePic}
+                  />
+                  <FilePreviewItem
+                    label="Driver License"
+                    file={formData.driverLicenseFile}
+                  />
+                  <FilePreviewItem
+                    label="Work Authorization"
+                    file={formData.visa.workAuthorization}
+                  />
+                  <FilePreviewItem
+                    label="OPT Receipt"
+                    file={formData.visa.optReceipt}
+                  />
                 </ul>
+
+                {Object.keys(documentURLs).length > 0 && (
+                  <>
+                    <h5 className="mt-4">Previously Uploaded Files</h5>
+                    <ul className="list-group">
+                      <PreviousFilePreview
+                        label="Profile Picture"
+                        url={documentURLs.profilePic}
+                      />
+                      <PreviousFilePreview
+                        label="Driver License"
+                        url={documentURLs.driverLicenseFile}
+                      />
+                      <PreviousFilePreview
+                        label="Work Authorization"
+                        url={documentURLs.workAuthorization}
+                      />
+                      <PreviousFilePreview
+                        label="OPT Receipt"
+                        url={documentURLs.optReceipt}
+                      />
+                    </ul>
+                  </>
+                )}
               </div>
 
               {/* Submit Button */}
