@@ -14,7 +14,8 @@ export const submitOnboarding = createAsyncThunk(
   async (formData: FormData) => {
     const res = await axios.post(
       "http://localhost:8080/api/onboarding",
-      formData, {
+      formData,
+      {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -50,6 +51,11 @@ const onboardingSlice = createSlice({
       .addCase(fetchOnboarding.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.onboarding = action.payload;
+
+        // Automatically set submitted to true if application exists
+        if (action.payload && action.payload._id) {
+          state.submitted = true;
+        }
       })
       .addCase(fetchOnboarding.rejected, (state, action) => {
         state.status = "failed";

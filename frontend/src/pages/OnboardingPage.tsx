@@ -7,20 +7,36 @@ import {
 } from "../store/slices/onboardingSlice";
 import GeneralLoading from "../components/skeletons/GeneralLoading";
 import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function OnboardingPage() {
   const dispatch = useDispatch<AppDispatch>();
   const onboarding = useSelector((state: RootState) => state.onboarding);
+  const navigate = useNavigate();
+
+  const applicationStatus = (onboarding.onboarding as any)?.status;
+
   const [showProfilePic, setShowProfilePic] = useState(false);
   const [showOptReceipt, setShowOptReceipt] = useState(false);
   const [showWorkAuthorization, setShowWorkAuthorization] = useState(false);
   const [showDriverLicenseFile, setShowDriverLicenseFile] = useState(false);
 
-  const submitted = useSelector((state: RootState) => state.onboarding.submitted);
+  const submitted = useSelector(
+    (state: RootState) => state.onboarding.submitted
+  );
 
-  
+  useEffect(() => {
+    dispatch(fetchOnboarding());
+  }, [dispatch]);
 
+  // if user is already submitted, or application is approved, redirect
+  // onboarding.onboarding is a single object which contains the entire application
+  useEffect(() => {
+    const applicatonStatus = (onboarding.onboarding as any)?.status;
+    if (submitted && applicatonStatus?.toLowerCase() === "approved") {
+      navigate(`/app/dashboard`);
+    }
+  }, [submitted, navigate, onboarding]);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -89,6 +105,61 @@ export default function OnboardingPage() {
   });
 
   useEffect(() => {
+    if ((onboarding.onboarding as any)?.data && !submitted) return;
+    if ((onboarding.onboarding as any)?.data) {
+      const {
+        firstName,
+        lastName,
+        middleName,
+        preferredName,
+        address,
+        cellPhone,
+        workPhone,
+        car,
+        email,
+        ssn,
+        dob,
+        gender,
+        isCitizenOrPR,
+        citizenstatus,
+        visa,
+        hasDriverLicense,
+        driverLicenseNumber,
+        driverLicenseExpirationDate,
+        referral,
+        emergencyContact,
+      } = (onboarding.onboarding as any).data;
+
+      setFormData((prev) => ({
+        ...prev,
+        firstName,
+        lastName,
+        middleName,
+        preferredName,
+        address,
+        cellPhone,
+        workPhone,
+        car,
+        email,
+        ssn,
+        dob,
+        gender,
+        isCitizenOrPR,
+        citizenstatus,
+        visa: {
+          ...prev.visa,
+          ...visa,
+        },
+        hasDriverLicense,
+        driverLicenseNumber,
+        driverLicenseExpirationDate,
+        referral,
+        emergencyContact,
+      }));
+    }
+  }, [onboarding.onboarding, submitted]);
+
+  useEffect(() => {
     dispatch(fetchOnboarding());
   }, [dispatch]);
 
@@ -115,79 +186,82 @@ export default function OnboardingPage() {
     if (driverLicenseFile)
       submission.append("driverLicenseFile", driverLicenseFile);
 
-    dispatch(submitOnboarding(submission));
-    toast.success("Onboarding application submitted successfully!");
-    // clear the form
-    clearForm();
-  };
-
-  const clearForm = () => {
-    setFormData({
-      firstName: "",
-      lastName: "",
-      middleName: "",
-      preferredName: "",
-      profilePic: null,
-
-      address: {
-        building: "",
-        street: "",
-        city: "",
-        state: "",
-        zip: "",
-      },
-
-      cellPhone: "",
-      workPhone: "",
-
-      car: {
-        make: "",
-        model: "",
-        color: "",
-      },
-
-      email: "", // pre-filled
-      ssn: "",
-      dob: "",
-      gender: "",
-      isCitizenOrPR: "" as "" | "yes" | "no",
-      citizenstatus: "" as "" | "Green Card" | "Citizen",
-      visa: {
-        type: "",
-        optReceipt: null,
-        otherVisaTitle: "",
-        startDate: "",
-        endDate: "",
-        file: null,
-        workAuthorization: null,
-      },
-
-      hasDriverLicense: false,
-      driverLicenseNumber: "",
-      driverLicenseExpirationDate: "",
-      driverLicenseFile: null,
-
-      referral: {
-        firstName: "",
-        lastName: "",
-        middleName: "",
-        phone: "",
-        email: "",
-        relationship: "",
-      },
-
-      emergencyContact: [
-        {
-          firstName: "",
-          lastName: "",
-          middleName: "",
-          phone: "",
-          email: "",
-          relationship: "",
-        },
-      ],
+    // dispatch(submitOnboarding(submission));
+    dispatch(submitOnboarding(submission)).then(() => {
+      dispatch(fetchOnboarding()); // Refetch the onboarding data
+      toast.success("Onboarding application submitted successfully!");
     });
+    // clear the form
+    // clearForm();
   };
+
+  // const clearForm = () => {
+  //   setFormData({
+  //     firstName: "",
+  //     lastName: "",
+  //     middleName: "",
+  //     preferredName: "",
+  //     profilePic: null,
+
+  //     address: {
+  //       building: "",
+  //       street: "",
+  //       city: "",
+  //       state: "",
+  //       zip: "",
+  //     },
+
+  //     cellPhone: "",
+  //     workPhone: "",
+
+  //     car: {
+  //       make: "",
+  //       model: "",
+  //       color: "",
+  //     },
+
+  //     email: "", // pre-filled
+  //     ssn: "",
+  //     dob: "",
+  //     gender: "",
+  //     isCitizenOrPR: "" as "" | "yes" | "no",
+  //     citizenstatus: "" as "" | "Green Card" | "Citizen",
+  //     visa: {
+  //       type: "",
+  //       optReceipt: null,
+  //       otherVisaTitle: "",
+  //       startDate: "",
+  //       endDate: "",
+  //       file: null,
+  //       workAuthorization: null,
+  //     },
+
+  //     hasDriverLicense: false,
+  //     driverLicenseNumber: "",
+  //     driverLicenseExpirationDate: "",
+  //     driverLicenseFile: null,
+
+  //     referral: {
+  //       firstName: "",
+  //       lastName: "",
+  //       middleName: "",
+  //       phone: "",
+  //       email: "",
+  //       relationship: "",
+  //     },
+
+  //     emergencyContact: [
+  //       {
+  //         firstName: "",
+  //         lastName: "",
+  //         middleName: "",
+  //         phone: "",
+  //         email: "",
+  //         relationship: "",
+  //       },
+  //     ],
+  //   });
+  // };
 
   if (onboarding.status === "loading") {
     return <GeneralLoading />;
@@ -195,7 +269,7 @@ export default function OnboardingPage() {
 
   return (
     <>
-      {submitted && (
+      {submitted && applicationStatus?.toLowerCase() === "pending" && (
         <div className="container my-3">
           <div className="alert alert-success" role="alert">
             Onboarding application submitted successfully!
@@ -206,7 +280,7 @@ export default function OnboardingPage() {
           </Link>
         </div>
       )}
-      {!submitted && (
+      {(!submitted || applicationStatus?.toLowerCase() === "rejected") && (
         <div
           className="container-fluid"
           style={{
