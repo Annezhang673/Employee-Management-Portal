@@ -1,7 +1,7 @@
 export default function ErrorPage() {
-    return (
-        <div>
-            <h1>Error Page</h1>
-        </div>
-    );
+  return (
+    <div className="alert alert-danger text-center">
+      <h1>Something Went Wrong</h1>
+    </div>
+  );
 }

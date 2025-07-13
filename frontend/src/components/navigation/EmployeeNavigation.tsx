@@ -7,7 +7,7 @@ export default function EmployeeNavigation() {
     location.pathname === path ? "active" : "";
 
   return (
-    <nav className="navbar navbar-expand-lg bg-success navbar-dark">
+    <nav className="navbar navbar-expand-lg bg-secondary navbar-dark">
       <div className="container-fluid">
         {/* Brand */}
         <Link className="navbar-brand fw-bold" to="/">
@@ -48,7 +48,7 @@ export default function EmployeeNavigation() {
             >
               Housing
             </Link>
-            <button className=" btn btn-primary me-2">logout</button>
+            <button className=" btn btn-outline-primary me-2">logout</button>
           </div>
         </div>
       </div>

@@ -7,7 +7,7 @@ export default function HRNavigation() {
     location.pathname === path ? "active" : "";
 
   return (
-    <nav className="navbar navbar-expand-lg bg-primary navbar-dark">
+    <nav className="navbar navbar-expand-lg bg-secondary navbar-dark">
       <div className="container-fluid">
         {/* Brand */}
         <Link className="navbar-brand fw-bold" to="/">
@@ -37,6 +37,12 @@ export default function HRNavigation() {
               Employee Profile
             </Link>
             <Link
+              to={"/app/hiringmanagement"}
+              className={`nav-link ${isActive("/app/hiringmanagement")}`}
+            >
+              Hiring Management
+            </Link>
+            <Link
               className={`nav-link ${isActive("/app/visamanagement")}`}
               to="/app/visamanagement"
             >
@@ -48,7 +54,7 @@ export default function HRNavigation() {
             >
               Housing Management
             </Link>
-            <button className="btn btn-primary">logout</button>
+            <button className="btn btn-outline-primary">logout</button>
           </div>
         </div>
       </div>
