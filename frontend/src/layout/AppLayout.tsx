@@ -17,11 +17,11 @@ export default function AppLayout() {
   if (!user) return <Navigate to="/login" replace />;
 
   return (
-    <>
+    <div className="d-flex flex-column min-vh-100 bg-primary">
       {user.role === "hr" ? <HRNavigation /> : <EmployeeNavigation />}
-      <main className="container mt-4">
+      <main className="flex-grow-1 mt-4 text-dark">
         <Outlet />
       </main>
-    </>
+    </div>
   );
 }

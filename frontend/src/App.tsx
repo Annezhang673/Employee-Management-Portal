@@ -17,6 +17,7 @@ import HousingPage from "./pages/Employee/HousingPage";
 import HousingManagementPage from "./pages/HR/HousingManagementPage";
 import EmployeeManagementPage from "./pages/HR/EmployeeManagementPage";
 import HiringManagementPage from "./pages/HR/HiringManagementPage";
+import VisaStatusManagementPage from "./pages/HR/VisaStatusManagementPage";
 
 function App() {
   const router = createBrowserRouter([
@@ -45,12 +46,13 @@ function App() {
         },
         // Employee routes
         { path: "visa", element: <VisaStatusPage /> },
-        {path: "housing", element: <HousingPage />},
+        { path: "housing", element: <HousingPage /> },
 
         // HR routes
-        {path: "employeemanagement", element: <EmployeeManagementPage />},
-        {path: 'visamanagement', element: <HiringManagementPage />},
-        {path: "housingmanagement", element: <HousingManagementPage />},
+        { path: "employeemanagement", element: <EmployeeManagementPage /> },
+        { path: "visamanagement", element: <VisaStatusManagementPage /> },
+        { path: "hiringmanagement", element: <HiringManagementPage /> },
+        { path: "housingmanagement", element: <HousingManagementPage /> },
       ],
     },
     // Register routes when employee click tokenLink

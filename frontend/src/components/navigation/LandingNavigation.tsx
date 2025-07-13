@@ -10,10 +10,10 @@ export default function LandingNavigation() {
     location.pathname === path ? "active" : "";
 
   return (
-    <nav className="navbar navbar-expand-lg bg-body-tertiary bg-light shadow-sm">
+    <nav className="navbar navbar-expand-lg bg-secondary navbar-dark shadow-sm">
       <div className="container-fluid">
         <Link to="/" className="navbar-brand fw-bold">
-          HR Portal
+          Portal Management
         </Link>
 
         <button
