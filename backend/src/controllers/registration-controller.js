@@ -29,8 +29,11 @@ export const validateToken = async (req, res) => {
     const tokenDoc = await RegistrationToken.findOne({ token });
 
     if (!tokenDoc || tokenDoc.used || tokenDoc.expiresAt < Date.now()) {
-      res.status(400).json({ error: "Invalid or expired token" });
+      return res.status(400).json({ error: "Invalid or expired token" });
     }
+
+    tokenDoc.used = true;
+    await tokenDoc.save();
 
     res.status(200).json({ email: tokenDoc.email, valid: true });
   } catch (error) {

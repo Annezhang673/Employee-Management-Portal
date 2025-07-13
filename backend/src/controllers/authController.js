@@ -1,28 +1,34 @@
-import User from '../models/user_model.js';
-import RegistrationToken from '../models/registrationToken-model.js';
-import House from '../models/house.js';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import User from "../models/user_model.js";
+import RegistrationToken from "../models/registrationToken-model.js";
+import House from "../models/house.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
-const JWT_EXPIRES_IN = '1d'; // Token valid for 1 day
+const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
+const JWT_EXPIRES_IN = "1d"; // Token valid for 1 day
 
 export const registerUser = async (req, res) => {
+  console.log(req.body);
+
   const { userName, email, password, token } = req.body;
+
+  // getting the token: http://localhost:3000/registration/77e2e9de047f62c6922490b459df95bd
 
   try {
     // Validate token
     const regToken = await RegistrationToken.findOne({ token });
 
     if (!regToken || regToken.expiresAt < new Date()) {
-      return res.status(400).json({ message: 'Invalid or expired token' });
+      return res.status(400).json({ message: "Invalid or expired token" });
     }
 
     // Check for duplicate email or username
     const emailExists = await User.findOne({ email });
     const usernameExists = await User.findOne({ userName });
     if (emailExists || usernameExists) {
-      return res.status(400).json({ message: 'Email or username already exists' });
+      return res
+        .status(400)
+        .json({ message: "Email or username already exists" });
     }
 
     // Hash password
@@ -35,11 +41,12 @@ export const registerUser = async (req, res) => {
     const houses = await House.find();
 
     if (houses.length === 0) {
-    return res.status(500).json({ message: 'No houses available for assignment' });
+      return res
+        .status(500)
+        .json({ message: "No houses available for assignment" });
     }
 
     const assignedHouse = houses[Math.floor(Math.random() * houses.length)];
-
 
     // Create user
     const newUser = new User({
@@ -47,15 +54,14 @@ export const registerUser = async (req, res) => {
       email: email,
       password: hashedPassword,
       house: assignedHouse._id,
-    //   role: 'employee',
-      role: 'Employee',
+      role: "Employee",
     });
 
     await newUser.save();
 
     // Mark token as used (optional: or delete it)
     await RegistrationToken.deleteOne({ token });
-    
+
     // Create JWT
     const payload = {
       id: newUser._id,
@@ -63,10 +69,13 @@ export const registerUser = async (req, res) => {
       email: newUser.email,
     };
 
-    const authToken = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-    res.status(201).json({ message: 'User registered successfully' });
+    const authToken = jwt.sign(payload, JWT_SECRET, {
+      expiresIn: JWT_EXPIRES_IN,
+    });
+
+    res.status(201).json({ authToken, message: "User registered successfully" });
   } catch (err) {
-    console.error('Registration error:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Registration error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };

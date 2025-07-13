@@ -3,10 +3,13 @@ import axios from "axios";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import registrationCover from "../assets/images/registrationCover.jpeg";
+import { useNavigate } from "react-router-dom";
 
 export default function RegistrationPage() {
   // when page loads, check if token is valid, else redirect
   // employee click tokenLink, http://localhost:3000/registration/b09a5903d0341aa5e47b31c3264729e3
+
+  const navigate = useNavigate();
 
   // pull token from url
   const token = window.location.href.split("/").pop();
@@ -27,14 +30,16 @@ export default function RegistrationPage() {
 
   type FormData = {
     email: string;
-    username: string;
+    userName: string;
     password: string;
+    token: string;
   };
 
   const [formData, setFormData] = useState<FormData>({
     email: "",
-    username: "",
+    userName: "",
     password: "",
+    token: token || "",
   });
 
   const handleChange = (e: any) => {
@@ -50,11 +55,19 @@ export default function RegistrationPage() {
     // send form data to backend to register
     const response = await axios.post(
       "http://localhost:8080/api/auth/register",
-      formData
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
     );
 
     const data = await response.data;
-    console.log(data);
+
+    if (data.success) {
+      navigate("/login");
+    }
   };
 
   return (
@@ -103,13 +116,13 @@ export default function RegistrationPage() {
               onChange={handleChange}
               autoComplete="off"
             />
-            <label htmlFor="username" className="form-label"></label>
+            <label htmlFor="userName" className="form-label"></label>
             <input
               type="text"
-              id="username"
-              name="username"
+              id="userName"
+              name="userName"
               placeholder="Username"
-              value={formData.username}
+              value={formData.userName}
               className="form-control"
               onChange={handleChange}
               autoComplete="off"

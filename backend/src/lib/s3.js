@@ -3,6 +3,7 @@ import {
   PutObjectCommand,
   GetObjectCommand,
 } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { v4 as uuid } from "uuid";
 import dotenv from "dotenv";
 
@@ -32,8 +33,8 @@ export const uploadFileToS3 = async (
 
   await s3.send(command);
 
-  const url = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
-  return { key, url };
+  // const url = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+  return { key };
 };
 
 export const getFileFromS3 = async (key) => {
@@ -43,4 +44,15 @@ export const getFileFromS3 = async (key) => {
       Key: key,
     })
     .createReadStream();
+};
+
+export const getSignedFileURL = async (key, expiresIn = 3600) => {
+  const command = new GetObjectCommand({
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: key,
+  });
+
+  const signedUrl = await getSignedUrl(s3, command, { expiresIn });
+
+  return signedUrl;
 };

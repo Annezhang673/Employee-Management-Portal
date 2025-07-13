@@ -1,5 +1,6 @@
 import {useState, useEffect, FormEvent} from 'react';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 /*
 RegistrationTokenTab purpose:
@@ -28,7 +29,7 @@ export default function RegistrationTokenTab() {
    async function fetchHistory() {
       setLoading(true);
       try{
-         const res = await axios.get<Token[]>('/api/tokens/status');
+         const res = await axios.get<Token[]>('http://localhost:8080/api/tokens/status');
          setHistory(res.data);
       } finally {
          setLoading(false);
@@ -40,12 +41,14 @@ export default function RegistrationTokenTab() {
       setLoading(true);
 
       try {
-         await axios.post('/api/tokens/generate', { email });
+         await axios.post('http://localhost:8080/api/tokens/generate', { email });
+
+         toast.success("Token generated successfully!");
          setEmail('')   // clear input
          await fetchHistory();   // refresh table
       } catch (err) {
          console.error(err);
-         alert("Failed to generate token");
+         toast.error("Failed to generate token");
       } finally {
          setLoading(false);
       }
