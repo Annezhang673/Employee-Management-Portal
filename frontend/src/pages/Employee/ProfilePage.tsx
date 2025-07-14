@@ -6,6 +6,9 @@ import axios from "axios";
 import { setUserInfo } from "../../store/slices/userInfoSlice";
 import ProfileNameSection from "../../components/profilePage/sections/ProfileNameSection";
 import { UserInfo } from "../OnboardingPage";
+import ProfileAddressSection from "../../components/profilePage/sections/ProfileAddressSection";
+import ProfileContactInfoSection from "../../components/profilePage/sections/ProfileContactInfoSection";
+import ProfileEmploymentSection from "../../components/profilePage/sections/ProfileEmploymentSection";
 
 export type ApplicationInfo = {
   _id: string;
@@ -16,11 +19,13 @@ export type ApplicationInfo = {
   feedback: string;
   documents: any[]; // optionally type this better
   data: UserInfo;
-}
+};
 
 export default function ProfilePage() {
   const dispatch = useDispatch<AppDispatch>();
-  const userInfo = useSelector((state: RootState) => state.userInfo as ApplicationInfo | null);
+  const userInfo = useSelector(
+    (state: RootState) => state.userInfo as ApplicationInfo | null
+  );
 
   const [form, setForm] = useState<Partial<UserInfo>>({});
 
@@ -61,6 +66,32 @@ export default function ProfilePage() {
         userInfo={userInfo ? userInfo.data : null}
         userId={mockId}
       />
+
+      <h2 className="mt-4 mb-4">Address</h2>
+      <ProfileAddressSection
+        form={form}
+        setForm={setForm}
+        userInfo={userInfo ? userInfo.data : null}
+        userId={mockId}
+      />
+
+      <h2 className="mt-4 mb-4">Contact Info</h2>
+      <ProfileContactInfoSection
+        form={form}
+        setForm={setForm}
+        userInfo={userInfo ? userInfo.data : null}
+        userId={mockId}
+      />
+
+      <h2 className="my-4">Employment</h2>
+      <ProfileEmploymentSection
+        form={form}
+        setForm={setForm}
+        userInfo={userInfo ? userInfo.data : null}
+        userId={mockId}
+      />
+
+      <h2 className="my-4">Emergency contact</h2>
     </div>
   );
 }

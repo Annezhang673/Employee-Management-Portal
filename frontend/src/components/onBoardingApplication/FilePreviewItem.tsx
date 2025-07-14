@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 
 type FilePreviewItemProps = {
   label: string;
-  file: File | null;
+  file: File | null | undefined;
 };
 
 export default function FilePreviewItem({ label, file }: FilePreviewItemProps) {

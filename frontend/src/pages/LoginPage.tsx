@@ -7,7 +7,10 @@ export default function LoginPage() {
     localStorage.setItem("token", "demo-token");
     localStorage.setItem("role", role);
     // navigate("/app/dashboard"); // maybe no time for dashboard page
-    navigate("/app/profile");
+    if (role === "hr") navigate("/app/employeemanagement");
+    else {
+      navigate("/app/profile");
+    }
   };
 
   return (

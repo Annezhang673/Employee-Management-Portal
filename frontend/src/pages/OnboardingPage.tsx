@@ -46,13 +46,13 @@ export type Car = {
 };
 
 export type VisaInfo = {
-  type: string;
-  optReceipt: File | null;
-  otherVisaTitle: string;
-  startDate: string;
-  endDate: string;
-  file: File | null;
-  workAuthorization: File | null;
+  type?: string;
+  optReceipt?: File | null;
+  otherVisaTitle?: string;
+  startDate?: string;
+  endDate?: string;
+  file?: File | null;
+  workAuthorization?: File | null;
 };
 
 export type UserInfo = {
@@ -150,13 +150,13 @@ export default function OnboardingPage() {
     isCitizenOrPR: "" as "" | "yes" | "no",
     citizenstatus: "" as "" | "Green Card" | "Citizen",
     visa: {
-      type: "",
-      optReceipt: null as File | null,
-      otherVisaTitle: "",
-      startDate: "",
-      endDate: "",
-      file: null as File | null,
-      workAuthorization: null as File | null,
+      type: "" as string,
+      optReceipt: null as File | null | undefined,
+      otherVisaTitle: "" as string,
+      startDate: "" as string,
+      endDate: "" as string,
+      file: null as File | null | undefined,
+      workAuthorization: null as File | null | undefined,
     },
 
     hasDriverLicense: false,
