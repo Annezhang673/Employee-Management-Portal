@@ -5,8 +5,10 @@ const registerationTokenSchema = new mongoose.Schema({
   token: { type: String, required: true },
   expiresAt: { type: Date, required: true },
   used: { type: Boolean, default: false },
+}, {
+  timestamps: true
 });
-
+ 
 const RegistrationToken = mongoose.model(
   "RegistrationToken",
   registerationTokenSchema

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import axiosApi from "../lib/axiosApi";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import registrationCover from "../assets/images/registrationCover.jpeg";
@@ -15,13 +16,16 @@ export default function RegistrationPage() {
   const token = window.location.href.split("/").pop();
   useEffect(() => {
     const validateToken = async () => {
-      const response = await fetch(
-        `http://localhost:8080/api/tokens/validate/${token}`
-      );
-      const data = await response.json();
+      // const response = await fetch(
+      //   `http://localhost:8080/api/tokens/validate/${token}`
+      // );
+      // const data = await response.json();
+      const response = await axiosApi.get<{ valid: boolean}>(`/api/tokens/validate/${token}`);
+      const data = response.data;
 
       if (!data || !data.valid) {
-        window.location.href = "http://localhost:3000/";
+        // window.location.href = "http://localhost:3000/";
+        window.location.href = process.env.REACT_APP_API_URL || "/";
       }
     };
 
@@ -53,15 +57,20 @@ export default function RegistrationPage() {
     e.preventDefault();
 
     // send form data to backend to register
-    const response = await axios.post(
-      "http://localhost:8080/api/auth/register",
-      formData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    // const response = await axios.post(
+    //   "http://localhost:8080/api/auth/register",
+    //   formData,
+    //   {
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //   }
+    // );
+    const response = await axiosApi.post("/api/auth/register", formData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
     const data = await response.data;
 

@@ -19,6 +19,7 @@ import EmployeeManagementPage from "./pages/HR/EmployeeManagementPage";
 import HiringManagementPage from "./pages/HR/HiringManagementPage";
 import VisaStatusManagementPage from "./pages/HR/VisaStatusManagementPage";
 import ErrorPage from "./pages/ErrorPage";
+import ApplicationDetailPage from "./components/onBoardingApplication/ApplicationDetailPage";
 
 function App() {
   const router = createBrowserRouter([
@@ -63,6 +64,16 @@ function App() {
       path: "/registration/:token",
       element: <RegistrationPage />,
     },
+
+    {
+      path: "/app/hiring",
+      children: [
+        {
+          path: "review/:appId",
+          element: <ApplicationDetailPage />
+        }
+      ]
+    }
   ]);
 
   return (
