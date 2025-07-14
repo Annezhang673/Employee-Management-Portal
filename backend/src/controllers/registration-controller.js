@@ -45,7 +45,7 @@ export const validateToken = async (req, res) => {
 export const viewTokenStatus = async (req, res) => {
   try {
     const tokens = await RegistrationToken.find({});
-
+    
     res.status(200).json({ tokens });
   } catch (error) {
     console.log(error);
