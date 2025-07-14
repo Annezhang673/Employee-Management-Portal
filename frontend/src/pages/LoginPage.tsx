@@ -6,7 +6,8 @@ export default function LoginPage() {
   const handleLogin = (role: string) => {
     localStorage.setItem("token", "demo-token");
     localStorage.setItem("role", role);
-    navigate("/app/dashboard");
+    // navigate("/app/dashboard"); // maybe no time for dashboard page
+    navigate("/app/profile");
   };
 
   return (

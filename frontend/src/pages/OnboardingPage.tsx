@@ -12,7 +12,6 @@ import FilePreviewItem from "../components/onBoardingApplication/FilePreviewItem
 import { PreviousFilePreview } from "../components/onBoardingApplication/PreviousFilePreview";
 import EmergencyContactFormList from "../components/onBoardingApplication/EmergencyContactFormList";
 
-
 // adding all file from formData
 export type EmergencyContact = {
   firstName: string;
@@ -84,7 +83,6 @@ export type UserInfo = {
   referral: Referral;
   emergencyContact: EmergencyContact[];
 };
-
 
 export default function OnboardingPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -600,7 +598,14 @@ export default function OnboardingPage() {
                   type="email"
                   className="form-control"
                   placeholder="Email"
-                  readOnly
+                  pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                  title="Please enter a valid email address"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  required
+                  // readOnly
                 />
               </div>
 

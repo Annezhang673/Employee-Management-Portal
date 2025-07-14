@@ -28,6 +28,9 @@ export default function ProfileNameSection({
         middleName: form.middleName,
         preferredName: form.preferredName,
         email: form.email,
+        ssn: form.ssn,
+        dob: form.dob,
+        gender: form.gender,
       });
       toast.success("Name section saved successfully!");
       setIsEditing(false);
@@ -44,15 +47,15 @@ export default function ProfileNameSection({
 
   return (
     <EditableSection
-      title="Name"
+      title="Name Fields"
       isEditing={isEditing}
       setIsEditing={setIsEditing}
       onSave={handleSave}
       onCancel={handleCancel}
     >
       <div className="row">
-        <div className="col-md-6 mb-2">
-          <label>First Name</label>
+        <div className="col-md-4 mb-2">
+          <label className="form-label">First Name</label>
           <input
             className="form-control"
             disabled={!isEditing}
@@ -60,8 +63,8 @@ export default function ProfileNameSection({
             onChange={(e) => setForm({ ...form, firstName: e.target.value })}
           />
         </div>
-        <div className="col-md-6 mb-2">
-          <label>Middle Name</label>
+        <div className="col-md-4 mb-2">
+          <label className="form-label">Middle Name</label>
           <input
             className="form-control"
             disabled={!isEditing}
@@ -69,8 +72,8 @@ export default function ProfileNameSection({
             onChange={(e) => setForm({ ...form, middleName: e.target.value })}
           />
         </div>
-        <div className="col-md-6 mb-2">
-          <label>Last Name</label>
+        <div className="col-md-4 mb-2">
+          <label className="form-label">Last Name</label>
           <input
             className="form-control"
             disabled={!isEditing}
@@ -79,7 +82,7 @@ export default function ProfileNameSection({
           />
         </div>
         <div className="col-md-6 mb-2">
-          <label>Preferred Name</label>
+          <label className="form-label">Preferred Name</label>
           <input
             className="form-control"
             disabled={!isEditing}
@@ -88,6 +91,53 @@ export default function ProfileNameSection({
               setForm({ ...form, preferredName: e.target.value })
             }
           />
+        </div>
+        <div className="col-md-6 mb-2">
+          <label className="form-label">Email</label>
+          <input
+            className="form-control"
+            disabled={!isEditing}
+            value={form.email || ""}
+            pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+            title="Please enter a valid email address"
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+          />
+        </div>
+        <div className="col-md-6 mb-2">
+          <label className="form-label">SSN</label>
+          <input
+            className="form-control"
+            disabled={!isEditing}
+            value={form.ssn || ""}
+            onChange={(e) => setForm({ ...form, ssn: e.target.value })}
+            pattern="^\d{9}$"
+            title="Please enter a valid 9-digit SSN"
+            required
+          />
+        </div>
+        <div className="col-md-6 mb-2">
+          <label className="form-label">Date of Birth</label>
+          <input
+            className="form-control"
+            disabled={!isEditing}
+            type="date"
+            value={form.dob || ""}
+            onChange={(e) => setForm({ ...form, dob: e.target.value })}
+          />
+        </div>
+        <div className="col-md-6 mb-2">
+          <label className="form-label">Gender</label>
+          <select
+            className="form-select"
+            disabled={!isEditing}
+            value={form.gender || ""}
+            onChange={(e) => setForm({ ...form, gender: e.target.value })}
+          >
+            <option value="">Select Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
         </div>
       </div>
     </EditableSection>
