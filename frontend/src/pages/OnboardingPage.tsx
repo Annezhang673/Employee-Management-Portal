@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import FilePreviewItem from "../components/onBoardingApplication/FilePreviewItem";
 import { PreviousFilePreview } from "../components/onBoardingApplication/PreviousFilePreview";
+import EmergencyContactFormList from "../components/onBoardingApplication/EmergencyContactFormList";
 
 export default function OnboardingPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -200,8 +201,7 @@ export default function OnboardingPage() {
 
     if (profilePic) submission.append("profilePic", profilePic);
     if (optReceipt) submission.append("optReceipt", optReceipt);
-    if (workAuthorization)
-      submission.append("workAuthorization", workAuthorization);
+    if (workAuthorization) submission.append("ead", workAuthorization);
     if (driverLicenseFile)
       submission.append("driverLicenseFile", driverLicenseFile);
 
@@ -218,9 +218,9 @@ export default function OnboardingPage() {
   }
 
   return (
-    <>
+    <div className="container-fluid">
       {submitted && applicationStatus?.toLowerCase() === "pending" && (
-        <div className="container my-3">
+        <div className="my-3">
           <div className="alert alert-success" role="alert">
             Onboarding application submitted successfully!
           </div>
@@ -232,7 +232,7 @@ export default function OnboardingPage() {
       )}
       {(!submitted || applicationStatus?.toLowerCase() === "rejected") && (
         <div
-          className="container-fluid"
+          className="mt-3 bg-light rounded text-start p-3"
           style={{
             maxHeight: "100%",
             overflow: "auto",
@@ -240,10 +240,19 @@ export default function OnboardingPage() {
           }}
         >
           <h2 className="text-center fw-bold">Onboarding Application</h2>
-          <hr />
-
+          <hr className="dark" />
+          {applicationStatus?.toLowerCase() === "rejected" && (
+            <div className="d-flex justify-content-end me-3">
+              <Link
+                to="/app/onboarding/status"
+                className="btn btn-primary text-white"
+              >
+                Check Status
+              </Link>
+            </div>
+          )}
           <form
-            className="needs-validation container my-3 bg-light p-3 shadow"
+            className="needs-validation container my-3 bg-primary p-3 shadow"
             onSubmit={handleSubmit}
           >
             <>
@@ -439,11 +448,13 @@ export default function OnboardingPage() {
                     className="form-control"
                     type="tel"
                     placeholder="Cell Phone"
-                    required
                     value={formData.cellPhone}
+                    pattern="^\d{3}-\d{3}-\d{4}$"
+                    title="Please enter a valid phone number in the format XXX-XXX-XXXX"
                     onChange={(e) =>
                       setFormData({ ...formData, cellPhone: e.target.value })
                     }
+                    required
                   />
                 </div>
                 <div className="col-md-6">
@@ -452,6 +463,8 @@ export default function OnboardingPage() {
                     type="tel"
                     placeholder="Work Phone"
                     value={formData.workPhone}
+                    pattern="^\d{3}-\d{3}-\d{4}$"
+                    title="Please enter a valid phone number in the format XXX-XXX-XXXX"
                     onChange={(e) =>
                       setFormData({ ...formData, workPhone: e.target.value })
                     }
@@ -525,11 +538,13 @@ export default function OnboardingPage() {
                     type="text"
                     className="form-control"
                     placeholder="SSN"
-                    required
                     value={formData.ssn}
+                    pattern="^\d{3}-\d{2}-\d{4}$"
+                    title="Please enter a valid SSN in the format XXX-XX-XXXX"
                     onChange={(e) =>
                       setFormData({ ...formData, ssn: e.target.value })
                     }
+                    required
                   />
                 </div>
                 <div className="col-md-4">
@@ -649,6 +664,7 @@ export default function OnboardingPage() {
                         <label>Upload OPT Receipt</label>
                         <input
                           type="file"
+                          name="optReceipt"
                           className="form-control"
                           accept="image/*"
                           onChange={(e) =>
@@ -705,6 +721,7 @@ export default function OnboardingPage() {
                       <label>Upload Work Authorization</label>
                       <input
                         type="file"
+                        name="ead"
                         className="form-control"
                         onChange={(e) => {
                           setFormData({
@@ -748,6 +765,8 @@ export default function OnboardingPage() {
                       className="form-control"
                       type="text"
                       placeholder="License Number"
+                      pattern="[A-Z]{2}[0-9]{6}"
+                      title="Please enter a valid license number (e.g., AB123456)"
                       required
                       value={formData.driverLicenseNumber}
                       onChange={(e) =>
@@ -791,108 +810,12 @@ export default function OnboardingPage() {
                 </div>
               )}
 
-              <fieldset>
-                <legend className="fw-bold">Emergency Contact</legend>
-                {/* Emergency Contact */}
-                <div className="mb-4">
-                  {formData.emergencyContact.map((contact, idx) => (
-                    <div className="border rounded p-3 mb-3" key={idx}>
-                      <div className="row mb-2">
-                        <div className="col-md-6">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="First Name"
-                            value={contact.firstName}
-                            onChange={(e) => {
-                              const newContacts = [
-                                ...formData.emergencyContact,
-                              ];
-                              newContacts[idx].firstName = e.target.value;
-                              setFormData({
-                                ...formData,
-                                emergencyContact: newContacts,
-                              });
-                            }}
-                          />
-                        </div>
-                        <div className="col-md-6">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Last Name"
-                            value={contact.lastName}
-                            onChange={(e) => {
-                              const newContacts = [
-                                ...formData.emergencyContact,
-                              ];
-                              newContacts[idx].lastName = e.target.value;
-                              setFormData({
-                                ...formData,
-                                emergencyContact: newContacts,
-                              });
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <div className="row mb-2">
-                        <div className="col-md-6">
-                          <input
-                            type="tel"
-                            className="form-control"
-                            placeholder="Phone"
-                            value={contact.phone}
-                            onChange={(e) => {
-                              const newContacts = [
-                                ...formData.emergencyContact,
-                              ];
-                              newContacts[idx].phone = e.target.value;
-                              setFormData({
-                                ...formData,
-                                emergencyContact: newContacts,
-                              });
-                            }}
-                          />
-                        </div>
-                        <div className="col-md-6">
-                          <input
-                            type="email"
-                            className="form-control"
-                            placeholder="Email"
-                            value={contact.email}
-                            onChange={(e) => {
-                              const newContacts = [
-                                ...formData.emergencyContact,
-                              ];
-                              newContacts[idx].email = e.target.value;
-                              setFormData({
-                                ...formData,
-                                emergencyContact: newContacts,
-                              });
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Relationship"
-                          value={contact.relationship}
-                          onChange={(e) => {
-                            const newContacts = [...formData.emergencyContact];
-                            newContacts[idx].relationship = e.target.value;
-                            setFormData({
-                              ...formData,
-                              emergencyContact: newContacts,
-                            });
-                          }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </fieldset>
+              <EmergencyContactFormList
+                contacts={formData.emergencyContact}
+                setContacts={(updatted) =>
+                  setFormData({ ...formData, emergencyContact: updatted })
+                }
+              />
 
               <fieldset>
                 <legend className="fw-bold">Additional Information</legend>
@@ -942,6 +865,8 @@ export default function OnboardingPage() {
                         className="form-control"
                         placeholder="Referrer Phone"
                         value={formData.referral.phone}
+                        pattern="^\d{3}-\d{3}-\d{4}$"
+                        title="Please enter a valid phone number in the format XXX-XXX-XXXX"
                         onChange={(e) =>
                           setFormData({
                             ...formData,
@@ -1048,6 +973,6 @@ export default function OnboardingPage() {
           </form>
         </div>
       )}
-    </>
+    </div>
   );
 }

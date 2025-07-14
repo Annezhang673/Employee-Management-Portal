@@ -25,7 +25,24 @@ h6 {
   font-family: "Nunito", "calibri", "Times New Roman", Times, serif;
 }
 
+/* Text */
+.text-primary {
+  color: var(--primary-color) !important;
+}
+
+.text-secondary {
+  color: var(--secondary-color) !important;
+}
+
+.text-decoration {
+  color: var(--decoration-color) !important;
+}
+
 /* Background */
+.bg-light {
+  background-color: var(--primary-color) !important;
+}
+
 .bg-primary {
   background-color: var(--primary-color) !important;
 }
@@ -58,6 +75,17 @@ h6 {
 }
 
 hr {
+  border: 0;
+  height: 2px;
+  background-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0),
+    rgba(255, 255, 255, 0.75),
+    rgba(0, 0, 0, 0)
+  );
+}
+
+hr.dark {
   border: 0;
   height: 2px;
   background-image: linear-gradient(

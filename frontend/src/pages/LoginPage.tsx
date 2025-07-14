@@ -10,7 +10,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="container p-4">
+    <div className="container p-4 text-primary">
       <h2>Login Page</h2>
       <button
         className="btn btn-primary me-2"
