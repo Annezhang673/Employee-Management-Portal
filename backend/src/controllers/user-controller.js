@@ -28,26 +28,36 @@ export const getUserProfile = async (req, res) => {
 export const updateUserProfile = async (req, res) => {
   try {
     // pull the required fields, might have more, will adjust as needed
-    const { firstName, lastName, gender, address, phone, ssn, dob } = req.body;
+    //  req.body will contails partial application data, which user contains application id
 
-    const updatedUser = await User.findByIdAndUpdate(
-      req.user._id,
-      {
-        $set: {
-          firstName,
-          lastName,
-          gender,
-          address,
-          phone,
-          ssn,
-          dob,
-        },
-      },
-      {
-        new: true,
-      }
+    const userId = req?.user?._id || req.query.userId;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const application = await Application.findById(user.application);
+    if (!application) {
+      return res.status(404).json({ error: "Application not found" });
+    }
+
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId },
+      { $set: req.body },
+      { new: true }
     );
-    res.status(200).json(updatedUser);
+
+    application.data = {
+      ...application.data,
+      ...req.body,
+    };
+
+    const updatedApplication = await application.save();
+
+    res
+      .status(200)
+      .json({ user: updatedUser, application: updatedApplication });
   } catch (error) {
     console.log("Unable to update user profile", error);
     res.status(500).json({ error: "Unable to update user profile", error });

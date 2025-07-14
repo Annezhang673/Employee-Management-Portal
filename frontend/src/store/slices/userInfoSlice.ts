@@ -1,14 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { UserInfo } from "../../pages/OnboardingPage";
+import type { ApplicationInfo } from "../../pages/Employee/ProfilePage";
 
-const initialState = null as UserInfo | null;
-
+const initialState: ApplicationInfo | null = null;
 
 export const userInfoSlice = createSlice({
   name: "userInfo",
   initialState,
   reducers: {
-    setUserInfo: (state, action: PayloadAction<UserInfo>) => {
+    setUserInfo: (state, action) => {
       return action.payload;
     },
     updateUserField: (
