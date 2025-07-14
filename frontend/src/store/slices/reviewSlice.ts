@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
+import axiosApi from "../../lib/axiosApi";
+
 
 export interface AppRow {
    appId: string;
@@ -30,7 +32,7 @@ export const fetchBucket = createAsyncThunk<
    >(
    'review/fetchBucket',
    async (status) => {
-      const res = await axios.get<AppRow[]>('/api/hiring/review', { params: { status } });
+      const res = await axiosApi.get<AppRow[]>('/api/hiring/review', { params: { status } });
       return { status, data: res.data };
    }
 );
@@ -38,7 +40,7 @@ export const fetchBucket = createAsyncThunk<
 export const approveApp = createAsyncThunk<void, string>(
    'review/approveApp',
    async (appId, thunkAPI) => {
-      await axios.put(`/api/hiring/review/${appId}/approve`);
+      await axiosApi.put(`/api/hiring/review/${appId}/approve`);
       thunkAPI.dispatch(fetchBucket('Pending'));
       thunkAPI.dispatch(fetchBucket('Approved'));
    }
@@ -47,7 +49,7 @@ export const approveApp = createAsyncThunk<void, string>(
 export const rejectApp = createAsyncThunk<void, { appId: string; feedback: string }>(
    'review/rejectApp',
    async ({ appId, feedback }, thunkAPI) => {
-      await axios.put(`/api/hiring/review/${appId}/reject`, { feedback });
+      await axiosApi.put(`/api/hiring/review/${appId}/reject`, { feedback });
       thunkAPI.dispatch(fetchBucket('Pending'));
       thunkAPI.dispatch(fetchBucket('Rejected'));
    }

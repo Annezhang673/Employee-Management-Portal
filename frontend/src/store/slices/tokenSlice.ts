@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
+import axiosApi from '../../lib/axiosApi';
 
 interface RawToken {
    email:     string;
@@ -31,7 +32,7 @@ const initialState: TokenState = {
 export const fetchTokens = createAsyncThunk(
    'tokens/fetchTokens',
    async () => {
-      const response = await axios.get< {tokens: TokenRecord[]}>('/api/tokens/status');
+      const response = await axiosApi.get< {tokens: TokenRecord[]}>('/api/tokens/status');
       return response.data.tokens;
    }
 );
@@ -44,7 +45,7 @@ export const generateToken = createAsyncThunk<
    'tokens/generateToken',
    async (email, thunkAPI) => {
       try {
-         await axios.post('/api/tokens/generate', { email });
+         await axiosApi.post('/api/tokens/generate', { email });
          // after success, re-fetch history
          thunkAPI.dispatch(fetchTokens());
       } catch (err: any) {
