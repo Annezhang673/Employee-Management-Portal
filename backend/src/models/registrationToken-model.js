@@ -6,7 +6,7 @@ const registerationTokenSchema = new mongoose.Schema({
   expiresAt: { type: Date, required: true },
   used: { type: Boolean, default: false },
 });
-
+ 
 const RegistrationToken = mongoose.model(
   "RegistrationToken",
   registerationTokenSchema
