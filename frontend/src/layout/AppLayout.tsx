@@ -19,7 +19,10 @@ export default function AppLayout() {
   return (
     <div className="d-flex flex-column min-vh-100 bg-primary">
       {user.role === "hr" ? <HRNavigation /> : <EmployeeNavigation />}
-      <main className="flex-grow-1 mt-4 text-dark">
+      <main
+        className="flex-grow-1 text-dark"
+        // style={{ background: "linear-gradient(to bottom, #021024, #5483b3)" }}
+      >
         <Outlet />
       </main>
     </div>

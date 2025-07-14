@@ -20,7 +20,9 @@ export default function RootLayout() {
   return (
     <div className="d-flex flex-column min-vh-100 bg-primary text-dark">
       {renderNavigation()}
-      <main className="flex-grow-1">
+      <main className="flex-grow-1" style={{
+        background: "linear-gradient(to bottom, #021024, #5483b3)"
+      }}>
         <Outlet />
       </main>
     </div>

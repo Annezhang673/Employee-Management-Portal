@@ -1,11 +1,12 @@
 import Application from "../models/application_model.js";
+import User from "../models/user_model.js";
 import { getSignedFileURL, uploadFileToS3 } from "../lib/s3.js";
 
 // api/onboarding
 export const submitOnboardingApplication = async (req, res) => {
   try {
     // mock userId for now
-    const mockId = "6871ea0ed0419f9413b9f685";
+    const mockId = "68730bb6ffbffeea6daaf227";
     const userId = req?.user?._id || mockId;
 
     const rawData = req.body.data;
@@ -56,9 +57,55 @@ export const submitOnboardingApplication = async (req, res) => {
         user: userId,
         data: parseData,
         documents: mergedDocuments,
+        status:
+          existingApplication?.status === "Rejected"
+            ? "Pending"
+            : existingApplication?.status || "Pending",
       },
       { upsert: true, new: true }
     );
+
+    const visaDocFields = ["optReceipt", "ead", "i983", "newI20"];
+    const visaDocTypeMap = {
+      optReceipt: "OPT Receipt",
+      ead: "EAD",
+      i983: "I-983",
+      newI20: "New I-20",
+    };
+
+    const visaDocs = await Promise.all(
+      mergedDocuments
+        .filter((doc) => visaDocFields.includes(doc.name))
+        .map(async (doc) => {
+          const signedUrl = await getSignedFileURL(doc.s3Key);
+          return {
+            type: visaDocTypeMap[doc.name], // e.g., "OPT Receipt"
+            s3Key: doc.s3Key,
+            url: signedUrl,
+            uploadedAt: new Date(),
+            status: "Pending",
+          };
+        })
+    );
+
+    const userUpdate = {
+      application: updatedApp._id,
+    };
+
+    const profileDoc = mergedDocuments.find((doc) => doc.name === "profilePic");
+    if (profileDoc) {
+      const profileUrl = await getSignedFileURL(profileDoc.s3Key);
+      userUpdate.profilePic = profileUrl;
+    }
+
+    if (parseData.visa?.type) {
+      userUpdate.visaType = parseData.visa.type;
+    }
+
+    await User.findByIdAndUpdate(userId, {
+      ...userUpdate,
+      visaDocs: visaDocs,
+    });
 
     const signedDocuments = await Promise.all(
       updatedApp.documents.map(async (doc) => {
@@ -83,7 +130,7 @@ export const submitOnboardingApplication = async (req, res) => {
 // get current latest onboarding application for user
 export const viewOnboardingApplication = async (req, res) => {
   try {
-    const userId = req?.user?._id || "6871ea0ed0419f9413b9f685";
+    const userId = req?.user?._id || "68730bb6ffbffeea6daaf227";
 
     const application = await Application.find({ user: userId });
 
@@ -121,7 +168,7 @@ export const viewOnboardingApplication = async (req, res) => {
 // update the onboarding application if needed, or reject by HR
 export const updateOnboardingApplication = async (req, res) => {
   try {
-    const userId = req?.user?._id || "6871ea0ed0419f9413b9f685";
+    const userId = req?.user?._id || "68730bb6ffbffeea6daaf227";
 
     const application = await Application.findOne({ user: userId });
 
