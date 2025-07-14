@@ -132,20 +132,21 @@ export default function RegistrationTokenTab() {
       <div>
          <h2>Generate Registration Token</h2>
          {error && <div className="alert alert-danger">{error}</div>}
+
          <form onSubmit={handleSubmit} className="mb-4">
-         <div className="input-group">
-            <input
-               type="email"
-               className="form-control"
-               placeholder="Employee email"
-               value={email}
-               onChange={e => setEmail(e.target.value)}
-               required
-            />
-            <button className="btn btn-primary" disabled={loading}>
-               {loading ? '…' : 'Generate'}
-            </button>
-         </div>
+            <div className="input-group">
+               <input
+                  type="email"
+                  className="form-control"
+                  placeholder="Employee email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+               />
+               <button className="btn btn-primary" disabled={loading}>
+                  {loading ? '…' : 'Generate'}
+               </button>
+            </div>
          </form>
 
          <h3>History</h3>
@@ -153,7 +154,31 @@ export default function RegistrationTokenTab() {
          {!loading && history.length === 0 && <p>No tokens yet.</p>}
          {!loading && history.length > 0 && (
          <table className="table">
-            {/* … render history rows … */}
+            <thead>
+               <tr>
+                  <th>Email</th>
+                  <th>Link</th>
+                  <th>Status</th>
+                  <th>Created At</th>
+               </tr>
+            </thead>
+
+            <tbody>
+               {history.map( t => (
+                  <tr key={t.link}>
+                     <td>{t.email}</td>
+
+                     <td>
+                        <a href={t.link} target="_blank" rel="noreferrer">
+                           {t.link}
+                        </a>
+                     </td>
+
+                     <td>{t.status}</td>
+                     <td>{new Date(t.createdAt).toLocaleString()}</td>
+                  </tr>
+               ))}
+            </tbody>
          </table>
          )}
       </div>

@@ -22,9 +22,9 @@ const initialState: TokenState = {
 
 export const fetchTokens = createAsyncThunk(
    'tokens/fetchTokens',
-   async (_, thunkAPI) => {
-      const response = await axios.get<TokenRecord[]>('/api/tokens/status');
-      return response.data;
+   async () => {
+      const response = await axios.get< {tokens: TokenRecord[]}>('/api/tokens/status');
+      return response.data.tokens;
    }
 );
 
