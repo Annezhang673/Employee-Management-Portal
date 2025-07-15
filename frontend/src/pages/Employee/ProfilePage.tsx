@@ -2,60 +2,45 @@ import { useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "../../store/store";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { setUserInfo } from "../../store/slices/userInfoSlice";
+import { fetchUserInfo } from "../../store/slices/userInfoSlice";
+
 import ProfileNameSection from "../../components/profilePage/sections/ProfileNameSection";
-import { UserInfo } from "../OnboardingPage";
 import ProfileAddressSection from "../../components/profilePage/sections/ProfileAddressSection";
 import ProfileContactInfoSection from "../../components/profilePage/sections/ProfileContactInfoSection";
 import ProfileEmploymentSection from "../../components/profilePage/sections/ProfileEmploymentSection";
+import ProfileEmergencyContactSection from "../../components/profilePage/sections/ProfileEmergencyContactSection";
+import ProfileDocumentSection from "../../components/profilePage/sections/ProfileDocumentSection";
+import GeneralLoading from "../../components/skeletons/GeneralLoading";
 
-export type ApplicationInfo = {
-  _id: string;
-  user: string;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-  feedback: string;
-  documents: any[]; // optionally type this better
-  data: UserInfo;
-};
+import type { UserInfo } from "../OnboardingPage";
+import type { Document } from "../OnboardingPage";
 
 export default function ProfilePage() {
   const dispatch = useDispatch<AppDispatch>();
-  const userInfo = useSelector(
-    (state: RootState) => state.userInfo as ApplicationInfo | null
-  );
+  const userInfo = useSelector((state: RootState) => state.userInfo.userInfo);
 
   const [form, setForm] = useState<Partial<UserInfo>>({});
+  const [documents, setDocuments] = useState<Document[]>([]);
 
   const mockId = "68730bb6ffbffeea6daaf227";
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const response = await axios.get("http://localhost:8080/api/users/me", {
-          params: { userId: mockId },
-        });
-
-        if (response.data?.application) {
-          dispatch(setUserInfo(response.data.application[0]));
-          setForm(response.data.application[0].data);
-        }
-      } catch (error) {
-        console.error("Error fetching user info:", error);
-      }
-    };
-    if (userInfo === null) {
-      fetchUserInfo();
+    if (!userInfo) {
+      dispatch(fetchUserInfo());
     }
-  }, [userInfo, dispatch]);
+  }, [dispatch, userInfo]);
 
   useEffect(() => {
-    if (userInfo?.data) {
-      setForm(userInfo.data);
+    if (userInfo) {
+      setForm(userInfo);
+      setDocuments(userInfo.documents || []);
     }
   }, [userInfo]);
+
+  if (!userInfo) return <GeneralLoading />;
+
+  console.log(userInfo);
+  
 
   return (
     <div className="container mt-4">
@@ -63,7 +48,7 @@ export default function ProfilePage() {
       <ProfileNameSection
         form={form}
         setForm={setForm}
-        userInfo={userInfo ? userInfo.data : null}
+        userInfo={userInfo}
         userId={mockId}
       />
 
@@ -71,7 +56,7 @@ export default function ProfilePage() {
       <ProfileAddressSection
         form={form}
         setForm={setForm}
-        userInfo={userInfo ? userInfo.data : null}
+        userInfo={userInfo}
         userId={mockId}
       />
 
@@ -79,7 +64,7 @@ export default function ProfilePage() {
       <ProfileContactInfoSection
         form={form}
         setForm={setForm}
-        userInfo={userInfo ? userInfo.data : null}
+        userInfo={userInfo}
         userId={mockId}
       />
 
@@ -87,11 +72,25 @@ export default function ProfilePage() {
       <ProfileEmploymentSection
         form={form}
         setForm={setForm}
-        userInfo={userInfo ? userInfo.data : null}
+        userInfo={userInfo}
         userId={mockId}
       />
 
       <h2 className="my-4">Emergency contact</h2>
+      <ProfileEmergencyContactSection
+        form={form}
+        setForm={setForm}
+        userInfo={userInfo}
+        userId={mockId}
+      />
+
+      {/* <h2 className="my-4">Documents</h2>
+      <ProfileDocumentSection
+        documents={documents}
+        setDocuments={setDocuments}
+        userInfo={userInfo}
+        userId={mockId}
+      /> */}
     </div>
   );
 }

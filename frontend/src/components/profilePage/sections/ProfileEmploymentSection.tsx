@@ -1,7 +1,7 @@
 import EditableSection from "../EditableSection";
 import type { UserInfo, VisaInfo } from "../../../pages/OnboardingPage";
 import toast from "react-hot-toast";
-import axios from "axios";
+import axiosApi from "../../../lib/axiosApi";
 import { useState } from "react";
 
 interface EmploymentSectionProps {
@@ -23,7 +23,7 @@ export default function ProfileEmploymentSection({
 
   const handleSave = async () => {
     try {
-      await axios.put(`http://localhost:8080/api/users/me?userId=${userId}`, {
+      await axiosApi.put(`/api/users/me?userId=${userId}`, {
         visa: {
           type: visa?.type,
           startDate: visa?.startDate,

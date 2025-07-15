@@ -2,8 +2,11 @@
 import EditableSection from "../EditableSection";
 import { UserInfo } from "../../../pages/OnboardingPage";
 import { useState } from "react";
-import axios from "axios";
+import axiosApi from "../../../lib/axiosApi";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../store/store";
+import { updateUserInfo } from "../../../store/slices/userInfoSlice";
 
 interface NameSectionProps {
   form: Partial<UserInfo>;
@@ -18,11 +21,12 @@ export default function ProfileNameSection({
   userInfo,
   userId,
 }: NameSectionProps) {
+  const dispatch = useDispatch<AppDispatch>();
   const [isEditing, setIsEditing] = useState(false);
 
   const handleSave = async () => {
     try {
-      await axios.put(`http://localhost:8080/api/users/me?userId=${userId}`, {
+      const payload = {
         firstName: form.firstName,
         lastName: form.lastName,
         middleName: form.middleName,
@@ -31,7 +35,9 @@ export default function ProfileNameSection({
         ssn: form.ssn,
         dob: form.dob,
         gender: form.gender,
-      });
+      }
+
+      dispatch(updateUserInfo(payload));
       toast.success("Name section saved successfully!");
       setIsEditing(false);
     } catch (err) {

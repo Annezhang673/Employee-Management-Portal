@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Address, UserInfo } from "../../../pages/OnboardingPage";
 import EditableSection from "../EditableSection";
-import axios from "axios";
+import axiosApi from "../../../lib/axiosApi";
 import toast from "react-hot-toast";
 
 interface AddressSectonProps {
@@ -20,11 +20,17 @@ export default function ProfileAddressSection({
 }: AddressSectonProps) {
   const [isEditing, setIsEditing] = useState(false);
 
-  const address: Address = form.address as Address;
+  const address: Address = form.address ?? {
+    building: "",
+    street: "",
+    city: "",
+    state: "",
+    zip: "",
+  };
 
   const handleSave = async () => {
     try {
-      await axios.put(`http://localhost:8080/api/users/me?userId=${userId}`, {
+      await axiosApi.put(`/api/users/me?userId=${userId}`, {
         address: {
           building: address?.building,
           street: address?.street,
@@ -41,7 +47,6 @@ export default function ProfileAddressSection({
     }
   };
 
-  console.log("form:", form);
   return (
     <EditableSection
       title="Address Field"
@@ -57,7 +62,7 @@ export default function ProfileAddressSection({
             className="form-control"
             type="text"
             placeholder="Building/Apt #"
-            value={address?.building}
+            value={address?.building || ""}
             onChange={(e) =>
               setForm({
                 ...form,
@@ -76,7 +81,7 @@ export default function ProfileAddressSection({
             className="form-control"
             type="text"
             placeholder="Street"
-            value={address?.street}
+            value={address?.street || ""}
             onChange={(e) =>
               setForm({
                 ...form,
@@ -95,7 +100,7 @@ export default function ProfileAddressSection({
             className="form-control"
             type="text"
             placeholder="City"
-            value={address?.city}
+            value={address?.city || ""}
             onChange={(e) =>
               setForm({
                 ...form,
@@ -114,7 +119,7 @@ export default function ProfileAddressSection({
             className="form-control"
             type="text"
             placeholder="State"
-            value={address?.state}
+            value={address?.state || ""}
             onChange={(e) =>
               setForm({
                 ...form,
@@ -133,7 +138,7 @@ export default function ProfileAddressSection({
             className="form-control"
             type="text"
             placeholder="Zip"
-            value={address?.zip}
+            value={address?.zip || ""}
             onChange={(e) =>
               setForm({
                 ...form,

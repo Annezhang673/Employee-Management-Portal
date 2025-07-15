@@ -22,14 +22,7 @@ export type EmergencyContact = {
   relationship: string;
 };
 
-export type Referral = {
-  firstName: string;
-  lastName: string;
-  middleName: string;
-  phone: string;
-  email: string;
-  relationship: string;
-};
+export type Referral = EmergencyContact;
 
 export type Address = {
   building: string;
@@ -55,7 +48,16 @@ export type VisaInfo = {
   workAuthorization?: File | null;
 };
 
+export type Document = {
+  _id: string;
+  name: string;
+  s3Key?: string;
+  url?: string;
+};
+
 export type UserInfo = {
+  application: any;
+  documents?: Document[] | never[];
   firstName: string;
   lastName: string;
   middleName: string;
@@ -183,6 +185,9 @@ export default function OnboardingPage() {
         relationship: "",
       },
     ],
+
+    documents: [],
+    application: {},
   });
 
   useEffect(() => {
@@ -598,8 +603,6 @@ export default function OnboardingPage() {
                   type="email"
                   className="form-control"
                   placeholder="Email"
-                  pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-                  title="Please enter a valid email address"
                   value={formData.email}
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })

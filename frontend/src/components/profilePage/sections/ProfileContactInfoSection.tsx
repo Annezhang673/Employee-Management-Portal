@@ -1,7 +1,7 @@
 import { useState } from "react";
 import EditableSection from "../EditableSection";
 import toast from "react-hot-toast";
-import axios from "axios";
+import axiosApi from "../../../lib/axiosApi";
 import { UserInfo } from "../../../pages/OnboardingPage";
 
 export type ContactInfo = {
@@ -26,7 +26,7 @@ export default function ProfileContactInfoSection({
 
   const handleSave = async () => {
     try {
-      await axios.put(`http://localhost:8080/api/users/me?userId=${userId}`, {
+      await axiosApi.put(`/api/users/me?userId=${userId}`, {
         cellPhone: form.cellPhone,
         workPhone: form.workPhone,
       });
@@ -52,7 +52,7 @@ export default function ProfileContactInfoSection({
           <input
             type="text"
             className="form-control"
-            value={form.cellPhone}
+            value={form.cellPhone || ""}
             onChange={(e) => setForm({ ...form, cellPhone: e.target.value })}
             disabled={!isEditing}
           />
@@ -62,7 +62,7 @@ export default function ProfileContactInfoSection({
           <input
             type="text"
             className="form-control"
-            value={form.workPhone}
+            value={form.workPhone || ""}
             onChange={(e) => setForm({ ...form, workPhone: e.target.value })}
             disabled={!isEditing}
           />

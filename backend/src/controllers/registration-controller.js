@@ -44,9 +44,20 @@ export const validateToken = async (req, res) => {
 // view token usage history
 export const viewTokenStatus = async (req, res) => {
   try {
-    const tokens = await RegistrationToken.find({});
+    // const tokens = await RegistrationToken.find({});
 
-    res.status(200).json({ tokens });
+    // res.status(200).json({ tokens });
+
+    const docs = await RegistrationToken.find({}).lean();
+    const tokens = docs.map(t => ({
+      email:     t.email,
+      link:      `http://localhost:3000/registration/${t.token}`,
+      status:    t.used ? 'Used'
+                : t.expiresAt < Date.now() ? 'Expired'
+                : 'Unused',
+      createdAt: t.createdAt.toISOString()
+    }));
+    res.json({ tokens });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });

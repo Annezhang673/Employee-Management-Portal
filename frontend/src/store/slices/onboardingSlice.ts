@@ -1,10 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import axiosApi from "../../lib/axiosApi";
 
 export const fetchOnboarding = createAsyncThunk(
   "onboarding/fetch",
   async () => {
-    const res = await axios.get("http://localhost:8080/api/onboarding");
+    // const res = await axios.get("http://localhost:8080/api/onboarding");
+    const res = await axiosApi.get("/api/onboarding");
     return res.data;
   }
 );
@@ -12,8 +13,8 @@ export const fetchOnboarding = createAsyncThunk(
 export const submitOnboarding = createAsyncThunk(
   "onboarding/submit",
   async (formData: FormData) => {
-    const res = await axios.post(
-      "http://localhost:8080/api/onboarding",
+    const res = await axiosApi.post(
+      "/api/onboarding",
       formData,
       {
         headers: {
