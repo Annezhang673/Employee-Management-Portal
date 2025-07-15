@@ -13,7 +13,7 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:8080/app/login", {
+      const res = await fetch("http://localhost:8080/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userName, password }),
@@ -34,7 +34,7 @@ export default function LoginPage() {
         if (data.role === "Employee") {
           navigate("/app/profile");
         } else {
-          navigate("/app/dashboard");
+          navigate("/app/employeemanagement");
         }
       } else {
         setError(data.message || "Login failed");
@@ -43,6 +43,7 @@ export default function LoginPage() {
       console.error("Login error:", err);
       setError("Server error");
     }
+    console.log()
   };
 
   return (
