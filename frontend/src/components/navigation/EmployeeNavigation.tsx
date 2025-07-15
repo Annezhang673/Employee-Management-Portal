@@ -6,6 +6,15 @@ export default function EmployeeNavigation() {
   const isActive = (path: string) =>
     location.pathname === path ? "active" : "";
 
+  const isLoggedIn = () => localStorage.getItem("token");
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("role");
+    window.location.href = "/";
+  };
+
   return (
     <nav className="navbar navbar-expand-lg bg-secondary navbar-dark">
       <div className="container-fluid">
@@ -48,7 +57,12 @@ export default function EmployeeNavigation() {
             >
               Housing
             </Link>
-            <button className=" btn btn-outline-primary me-2">logout</button>
+            <button
+              className=" btn btn-outline-primary me-2"
+              onClick={handleLogout}
+            >
+              {isLoggedIn() ? "Logout" : "Login"}
+            </button>
           </div>
         </div>
       </div>

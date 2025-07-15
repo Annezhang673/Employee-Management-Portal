@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import axiosApi from "../lib/axiosApi";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -22,6 +21,9 @@ export default function RegistrationPage() {
       // const data = await response.json();
       const response = await axiosApi.get<{ valid: boolean}>(`/api/tokens/validate/${token}`);
       const data = response.data;
+
+      console.log(data);
+      
 
       if (!data || !data.valid) {
         // window.location.href = "http://localhost:3000/";
@@ -56,16 +58,6 @@ export default function RegistrationPage() {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
-    // send form data to backend to register
-    // const response = await axios.post(
-    //   "http://localhost:8080/api/auth/register",
-    //   formData,
-    //   {
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //   }
-    // );
     const response = await axiosApi.post("/api/auth/register", formData, {
       headers: {
         "Content-Type": "application/json",

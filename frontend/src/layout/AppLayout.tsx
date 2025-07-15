@@ -4,15 +4,10 @@ import EmployeeNavigation from "../components/navigation/EmployeeNavigation";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-
-const getUser = () => {
-  const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role");
-  return token ? { role } : null;
-};
+import { getStoredUser } from "../lib/auth";
 
 export default function AppLayout() {
-  const user = getUser();
+  const user = getStoredUser();
 
   if (!user) return <Navigate to="/login" replace />;
 

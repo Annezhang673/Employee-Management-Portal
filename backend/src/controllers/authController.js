@@ -8,6 +8,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
 const JWT_EXPIRES_IN = "1d"; // Token valid for 1 day
 
 export const registerUser = async (req, res) => {
+
   const { userName, email, password, token } = req.body;
 
   // getting the token: http://localhost:3000/registration/77e2e9de047f62c6922490b459df95bd

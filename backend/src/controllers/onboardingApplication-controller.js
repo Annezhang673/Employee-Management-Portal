@@ -5,10 +5,7 @@ import { getSignedFileURL, uploadFileToS3 } from "../lib/s3.js";
 // api/onboarding
 export const submitOnboardingApplication = async (req, res) => {
   try {
-    // mock userId for now
-    const mockId = "68730bb6ffbffeea6daaf227";
-    const userId = req?.user?._id || mockId;
-
+    const userId = req?.user?._id;
     const rawData = req.body.data;
 
     if (!rawData) {
@@ -94,8 +91,8 @@ export const submitOnboardingApplication = async (req, res) => {
 
     const profileDoc = mergedDocuments.find((doc) => doc.name === "profilePic");
     if (profileDoc) {
-      const profileUrl = await getSignedFileURL(profileDoc.s3Key);
-      userUpdate.profilePic = profileUrl;
+      const { previewUrl } = await getSignedFileURL(profileDoc.s3Key);
+      userUpdate.profilePicUrl = previewUrl;
     }
 
     if (parseData.visa?.type) {
@@ -106,6 +103,8 @@ export const submitOnboardingApplication = async (req, res) => {
       ...userUpdate,
       visaDocs: visaDocs,
     });
+
+    const updatedUser = await User.findById(userId);
 
     const signedDocuments = await Promise.all(
       updatedApp.documents.map(async (doc) => {
@@ -130,7 +129,7 @@ export const submitOnboardingApplication = async (req, res) => {
 // get current latest onboarding application for user
 export const viewOnboardingApplication = async (req, res) => {
   try {
-    const userId = req?.user?._id || "68730bb6ffbffeea6daaf227";
+    const userId = req.user?._id;
 
     const application = await Application.find({ user: userId });
 
@@ -147,10 +146,11 @@ export const viewOnboardingApplication = async (req, res) => {
 
     const signedDocuments = await Promise.all(
       application[0].documents.map(async (doc) => {
-        const signedUrl = await getSignedFileURL(doc.s3Key);
+        const { previewUrl, downloadUrl } = await getSignedFileURL(doc.s3Key);
         return {
           ...doc.toObject(),
-          url: signedUrl,
+          previewUrl,
+          downloadUrl,
         };
       })
     );
@@ -168,7 +168,7 @@ export const viewOnboardingApplication = async (req, res) => {
 // update the onboarding application if needed, or reject by HR
 export const updateOnboardingApplication = async (req, res) => {
   try {
-    const userId = req?.user?._id || "68730bb6ffbffeea6daaf227";
+    const userId = req.user?._id;
 
     const application = await Application.findOne({ user: userId });
 
