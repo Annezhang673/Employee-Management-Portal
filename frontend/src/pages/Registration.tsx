@@ -109,7 +109,7 @@ export default function RegistrationPage() {
     try {
       // when they actually register, consume/mark-used
       await axiosApi.post(
-        `/api/tokens/validate/${token}`,
+        "api/auth/register",
         formData,
         { headers: { "Content-Type": "application/json" } }
       );
