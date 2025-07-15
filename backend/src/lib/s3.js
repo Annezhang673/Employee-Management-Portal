@@ -47,12 +47,27 @@ export const getFileFromS3 = async (key) => {
 };
 
 export const getSignedFileURL = async (key, expiresIn = 3600) => {
-  const command = new GetObjectCommand({
+  const commandReview = new GetObjectCommand({
     Bucket: process.env.AWS_BUCKET_NAME,
     Key: key,
   });
 
-  const signedUrl = await getSignedUrl(s3, command, { expiresIn });
+  const commandDownload = new GetObjectCommand({
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: key,
+    ResponseContentDisposition: `attachment; filename="${key
+      .split("/")
+      .pop()}"`,
+  });
 
-  return signedUrl;
+  // const signedUrl = await getSignedUrl(s3, command, { expiresIn });
+  const [previewUrl, downloadUrl] = await Promise.all([
+    getSignedUrl(s3, commandReview, { expiresIn }),
+    getSignedUrl(s3, commandDownload, { expiresIn }),
+  ]);
+
+  return {
+    previewUrl,
+    downloadUrl,
+  };
 };

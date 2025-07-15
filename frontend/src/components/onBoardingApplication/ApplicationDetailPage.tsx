@@ -1,6 +1,6 @@
 import { useState, useEffect} from "react";
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosApi from "../../lib/axiosApi";
 
 export default function ApplicationDetailPage() {
    const { appId }   = useParams<{ appId: string }>();
@@ -13,7 +13,7 @@ export default function ApplicationDetailPage() {
    useEffect( () => {
       if (!appId) return;
 
-      axios.get(`/api/hiring/review/${appId}`)
+      axiosApi.get(`/api/hiring/review/${appId}`)
          .then(res => setApp(res.data))
          .catch(err => setError(err.message))
          .finally(() => setLoading(false));
@@ -23,14 +23,14 @@ export default function ApplicationDetailPage() {
    if (error || !app) return <p className="text-danger">Error: {error||'Not found'}</p>;
 
    const handleApprove = async () => {
-      await axios.put(`/api/hiring/review/${appId}/approve`);
+      await axiosApi.put(`/api/hiring/review/${appId}/approve`);
       alert('Approved');
       navigate(-1);
    };
    const handleReject = async () => {
       const fb = prompt('Feedback:')||'';
       if (!fb) return;
-      await axios.put(`/api/hiring/review/${appId}/reject`, { feedback: fb });
+      await axiosApi.put(`/api/hiring/review/${appId}/reject`, { feedback: fb });
       alert('Rejected');
       navigate(-1);
    };

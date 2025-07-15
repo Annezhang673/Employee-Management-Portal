@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 import axiosApi from "../../lib/axiosApi";
 
 export const fetchOnboarding = createAsyncThunk(

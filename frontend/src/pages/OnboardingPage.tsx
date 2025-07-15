@@ -12,6 +12,80 @@ import FilePreviewItem from "../components/onBoardingApplication/FilePreviewItem
 import { PreviousFilePreview } from "../components/onBoardingApplication/PreviousFilePreview";
 import EmergencyContactFormList from "../components/onBoardingApplication/EmergencyContactFormList";
 
+// adding all file from formData
+export type EmergencyContact = {
+  firstName: string;
+  lastName: string;
+  middleName: string;
+  phone: string;
+  email: string;
+  relationship: string;
+};
+
+export type Referral = EmergencyContact;
+
+export type Address = {
+  building: string;
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+};
+
+export type Car = {
+  make: string;
+  model: string;
+  color: string;
+};
+
+export type VisaInfo = {
+  type?: string;
+  optReceipt?: File | null;
+  otherVisaTitle?: string;
+  startDate?: string;
+  endDate?: string;
+  file?: File | null;
+  workAuthorization?: File | null;
+};
+
+export type Document = {
+  _id: string;
+  name: string;
+  s3Key?: string;
+  url?: string;
+};
+
+export type UserInfo = {
+  application: any;
+  documents?: Document[] | never[];
+  firstName: string;
+  lastName: string;
+  middleName: string;
+  preferredName: string;
+  profilePic: File | string | null;
+
+  address: Address;
+  cellPhone: string;
+  workPhone: string;
+
+  car: Car;
+  email: string;
+  ssn: string;
+  dob: string;
+  gender: string;
+  isCitizenOrPR: "" | "yes" | "no";
+  citizenstatus: "" | "Green Card" | "Citizen";
+  visa: VisaInfo;
+
+  hasDriverLicense: boolean;
+  driverLicenseNumber: string;
+  driverLicenseExpirationDate: string;
+  driverLicenseFile: File | null;
+
+  referral: Referral;
+  emergencyContact: EmergencyContact[];
+};
+
 export default function OnboardingPage() {
   const dispatch = useDispatch<AppDispatch>();
   const onboarding = useSelector((state: RootState) => state.onboarding);
@@ -33,7 +107,9 @@ export default function OnboardingPage() {
   // if user is already submitted, or application is approved, redirect
   // onboarding.onboarding is a single object which contains the entire application
   useEffect(() => {
-    const applicatonStatus = (onboarding.onboarding as any)?.status;
+    const applicatonStatus = (
+      onboarding.onboarding as any
+    )?.status?.toLowerCase();
     if (submitted && applicatonStatus?.toLowerCase() === "approved") {
       navigate(`/app/dashboard`);
     }
@@ -47,7 +123,7 @@ export default function OnboardingPage() {
     }
   }, [submitted, navigate, onboarding]);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<UserInfo>({
     firstName: "",
     lastName: "",
     middleName: "",
@@ -78,13 +154,13 @@ export default function OnboardingPage() {
     isCitizenOrPR: "" as "" | "yes" | "no",
     citizenstatus: "" as "" | "Green Card" | "Citizen",
     visa: {
-      type: "",
-      optReceipt: null as File | null,
-      otherVisaTitle: "",
-      startDate: "",
-      endDate: "",
-      file: null as File | null,
-      workAuthorization: null as File | null,
+      type: "" as string,
+      optReceipt: null as File | null | undefined,
+      otherVisaTitle: "" as string,
+      startDate: "" as string,
+      endDate: "" as string,
+      file: null as File | null | undefined,
+      workAuthorization: null as File | null | undefined,
     },
 
     hasDriverLicense: false,
@@ -111,6 +187,9 @@ export default function OnboardingPage() {
         relationship: "",
       },
     ],
+
+    documents: [],
+    application: {},
   });
 
   useEffect(() => {
@@ -120,8 +199,8 @@ export default function OnboardingPage() {
     const docs = (onboarding.onboarding as any).documents || [];
     const documentMap: { [key: string]: string } = {};
     docs.forEach((doc: any) => {
-      if (doc.url) {
-        documentMap[doc.name] = doc.url;
+      if (doc.previewUrl) {
+        documentMap[doc.name] = doc.previewUrl;
       }
     });
     setDocumentURLs(documentMap);
@@ -178,10 +257,6 @@ export default function OnboardingPage() {
       }));
     }
   }, [onboarding.onboarding, submitted]);
-
-  useEffect(() => {
-    dispatch(fetchOnboarding());
-  }, [dispatch]);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -526,7 +601,12 @@ export default function OnboardingPage() {
                   type="email"
                   className="form-control"
                   placeholder="Email"
-                  readOnly
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  required
+                  // readOnly
                 />
               </div>
 
@@ -922,7 +1002,7 @@ export default function OnboardingPage() {
                 <ul className="list-group">
                   <FilePreviewItem
                     label="Profile Picture"
-                    file={formData.profilePic}
+                    file={formData.profilePic as File | null}
                   />
                   <FilePreviewItem
                     label="Driver License"

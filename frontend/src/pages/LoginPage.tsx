@@ -1,49 +1,62 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axiosApi from "../lib/axiosApi";
 
 export default function LoginPage() {
-  const [selectedRole, setSelectedRole] = useState<"HR" | "Employee" | null>(null);
+  const [selectedRole, setSelectedRole] = useState<"HR" | "Employee" | null>(
+    null
+  );
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+
+    if (token && role === "Employee") navigate("/app/profile");
+    if (token && role === "HR") navigate("/app/employeemanagement");
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     try {
-      const res = await fetch("http://localhost:8080/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userName, password }),
+      const res = await axiosApi.post("/api/login", {
+        userName,
+        password,
       });
 
-      const data = await res.json();
+      const { token, userName: name, role, applicationStatus } = res.data;
 
-      if (res.status === 201) {
-        if (data.role !== selectedRole) {
-          setError(`This user is not registered as ${selectedRole}`);
-          return;
-        }
-
-        localStorage.setItem("token", "demo-token"); // Replace with real token
-        localStorage.setItem("userName", data.userName);
-        localStorage.setItem("role", data.role);
-
-        if (data.role === "Employee") {
-          navigate("/app/profile");
-        } else {
-          navigate("/app/employeemanagement");
-        }
-      } else {
-        setError(data.message || "Login failed");
+      if (role !== selectedRole) {
+        setError(`This user is not registered as ${selectedRole}`);
+        return;
       }
-    } catch (err) {
-      console.error("Login error:", err);
-      setError("Server error");
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("userName", name);
+      localStorage.setItem("role", role);
+
+      if (role === "HR") {
+        navigate("/app/employeemanagement");
+      } else if (role === "Employee") {
+        if (
+          !applicationStatus ||
+          applicationStatus.toLowerCase() === "rejected"
+        ) {
+          navigate("/app/onboarding");
+        } else {
+          navigate("/app/profile");
+        }
+      }
+    } catch (err: any) {
+      console.log("Login error: ", err);
+      const msg = err.response?.data?.message || "Server error";
+      setError(msg);
     }
-    console.log()
   };
 
   return (
@@ -63,14 +76,14 @@ export default function LoginPage() {
         Login as Employee
       </button>
 
-      <button className="btn btn-info me-2">
+      {/* <button className="btn btn-info me-2">
         <Link
           to={"/app/onboarding"}
           className="text-white text-decoration-none"
         >
           Temp entry for Onboarding
         </Link>
-      </button>
+      </button> */}
 
       {selectedRole && (
         <form onSubmit={handleSubmit} className="mt-4">

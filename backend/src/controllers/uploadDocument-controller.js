@@ -5,7 +5,7 @@ import Application from "../models/application_model.js";
 // expect a single file, folder = "documents", userId in req.user
 export const uploadDocuments = async (req, res) => {
   try {
-    const userId = req.user?._id || "anonymous";
+    const userId = req.user?.userId;
 
     // might try not accepting anonymous users later
 
@@ -14,7 +14,11 @@ export const uploadDocuments = async (req, res) => {
       return res.status(400).json({ error: "Document type is required" });
     }
 
-    const result = await uploadFileToS3(req.file, `documents/${documentType}`, userId);
+    const result = await uploadFileToS3(
+      req.file,
+      `documents/${documentType}`,
+      userId
+    );
 
     const application = await Application.findOne({ userId });
     if (!application) {
