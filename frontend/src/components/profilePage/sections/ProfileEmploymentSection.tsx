@@ -5,16 +5,17 @@ import axiosApi from "../../../lib/axiosApi";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../store/store";
-import { fetchUserInfo, updateUserInfo } from "../../../store/slices/userInfoSlice";
+import {
+  fetchUserInfo,
+  updateUserInfo,
+} from "../../../store/slices/userInfoSlice";
 
 interface EmploymentSectionProps {
   userInfo: UserInfo;
-  userId: string;
 }
 
 export default function ProfileEmploymentSection({
   userInfo,
-  userId,
 }: EmploymentSectionProps) {
   const dispatch = useDispatch<AppDispatch>();
   const [isEditing, setIsEditing] = useState(false);
@@ -24,9 +25,8 @@ export default function ProfileEmploymentSection({
       startDate: userInfo?.visa?.startDate,
       endDate: userInfo?.visa?.endDate,
     },
-  })
+  });
 
-  
   const handleSave = async () => {
     try {
       const payload = {
@@ -42,9 +42,9 @@ export default function ProfileEmploymentSection({
       if (form.visa?.file) {
         const formData = new FormData();
         formData.append("file", form.visa.file);
-        await axiosApi.post(`/users/${userId}/visa`, formData);
+        await axiosApi.post("/onboarding", formData);
       }
-      
+
       toast.success("Employment section saved successfully!");
       setIsEditing(false);
     } catch (error) {

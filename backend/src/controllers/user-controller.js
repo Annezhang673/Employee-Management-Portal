@@ -1,5 +1,6 @@
 import User from "../models/user_model.js";
 import Application from "../models/application_model.js";
+import { uploadFileToS3, getSignedFileURL } from "../lib/s3.js";
 
 // Get api/users/me
 export const getUserProfile = async (req, res) => {
@@ -17,7 +18,13 @@ export const getUserProfile = async (req, res) => {
     const application = await Application.find({ _id: applicationId });
     user.application = application;
 
-    res.status(200).json({ user, application });
+    let signedProfilePicUrl = null;
+    if (user.profilePicUrl) {
+      const {previewUrl} = await getSignedFileURL(user.profilePicUrl);
+      signedProfilePicUrl = previewUrl
+    }
+
+    res.status(200).json({ user, application, signedProfilePicUrl });
   } catch (error) {
     console.log("Unable to get user profile", error);
     res.status(500).json({ error: "Unable to get user profile", error });
@@ -39,11 +46,21 @@ export const updateUserProfile = async (req, res) => {
       return res.status(404).json({ error: "Application not found" });
     }
 
+    const formData = JSON.parse(req.body.data || "{}");
+
+    if (req.file) {
+      const { key } = await uploadFileToS3(req.file, "documents", userId);
+      formData.profilePic = key;
+      user.profilePicUrl = key;
+    }
+
     const updatedUser = await User.findOneAndUpdate(
       { _id: userId },
-      { $set: req.body },
+      { $set: formData },
       { new: true }
     );
+
+    await user.save();
 
     application.data = {
       ...application.data,

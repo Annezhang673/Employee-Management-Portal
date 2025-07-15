@@ -12,13 +12,11 @@ import {
 
 interface AddressSectonProps {
   userInfo: UserInfo | null;
-  userId: string;
 }
 
 // Building/apt#, street name, city, state, zip
 export default function ProfileAddressSection({
   userInfo,
-  userId,
 }: AddressSectonProps) {
   const dispatch = useDispatch<AppDispatch>();
   const [isEditing, setIsEditing] = useState(false);

@@ -18,8 +18,6 @@ export default function ProfilePage() {
 
   const [activeSection, setActiveSection] = useState("nameSection");
 
-  const mockId = "68730bb6ffbffeea6daaf227";
-
   useEffect(() => {
     if (!userInfo) {
       dispatch(fetchUserInfo());
@@ -31,26 +29,75 @@ export default function ProfilePage() {
   return (
     <>
       <div className="container mt-4">
-        
-      </div>
-      <div className="container mt-4">
-        <h2 className="mb-4">Personal Information</h2>
-        <ProfileNameSection userInfo={userInfo} userId={mockId} />
+        <div className="d-flex gap-2 align-items-center mb-4">
+          <button
+            className={`btn btn-outline-primary ${
+              activeSection === "nameSection" ? "active" : ""
+            }`}
+            onClick={() => setActiveSection("nameSection")}
+          >
+            Name Section
+          </button>
+          <button
+            className={`btn btn-outline-primary ${
+              activeSection === "addressSection" ? "active" : ""
+            }`}
+            onClick={() => setActiveSection("addressSection")}
+          >
+            Address Section
+          </button>
+          <button
+            className={`btn btn-outline-primary ${
+              activeSection === "contactInfoSection" ? "active" : ""
+            }`}
+            onClick={() => setActiveSection("contactInfoSection")}
+          >
+            Contact Info Section
+          </button>
+          <button
+            className={`btn btn-outline-primary ${
+              activeSection === "employmentSection" ? "active" : ""
+            }`}
+            onClick={() => setActiveSection("employmentSection")}
+          >
+            Employment Section
+          </button>
+          <button
+            className={`btn btn-outline-primary ${
+              activeSection === "emergencyContactSection" ? "active" : ""
+            }`}
+            onClick={() => setActiveSection("emergencyContactSection")}
+          >
+            Emergency Contact Section
+          </button>
+          <button
+            className={`btn btn-outline-primary ${
+              activeSection === "documentSection" ? "active" : ""
+            }`}
+            onClick={() => setActiveSection("documentSection")}
+          >
+            Document Section
+          </button>
+        </div>
 
-        <h2 className="mt-4 mb-4">Address</h2>
-        <ProfileAddressSection userInfo={userInfo} userId={mockId} />
-
-        <h2 className="mt-4 mb-4">Contact Info</h2>
-        <ProfileContactInfoSection userInfo={userInfo} userId={mockId} />
-
-        <h2 className="my-4">Employment</h2>
-        <ProfileEmploymentSection userInfo={userInfo} userId={mockId} />
-
-        <h2 className="my-4">Emergency contact</h2>
-        <ProfileEmergencyContactSection userInfo={userInfo} userId={mockId} />
-
-        <h2 className="my-4">Documents</h2>
-        <ProfileDocumentSection userInfo={userInfo} userId={mockId} />
+        {activeSection === "nameSection" && (
+          <ProfileNameSection userInfo={userInfo} />
+        )}
+        {activeSection === "addressSection" && (
+          <ProfileAddressSection userInfo={userInfo} />
+        )}
+        {activeSection === "contactInfoSection" && (
+          <ProfileContactInfoSection userInfo={userInfo} />
+        )}
+        {activeSection === "employmentSection" && (
+          <ProfileEmploymentSection userInfo={userInfo} />
+        )}
+        {activeSection === "emergencyContactSection" && (
+          <ProfileEmergencyContactSection userInfo={userInfo} />
+        )}
+        {activeSection === "documentSection" && (
+          <ProfileDocumentSection userInfo={userInfo} />
+        )}
       </div>
     </>
   );

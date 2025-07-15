@@ -12,13 +12,9 @@ import {
 
 interface NameSectionProps {
   userInfo: UserInfo | null;
-  userId: string;
 }
 
-export default function ProfileNameSection({
-  userInfo,
-  userId,
-}: NameSectionProps) {
+export default function ProfileNameSection({ userInfo }: NameSectionProps) {
   const dispatch = useDispatch<AppDispatch>();
   const [isEditing, setIsEditing] = useState(false);
 
@@ -79,9 +75,6 @@ export default function ProfileNameSection({
     setForm(userInfo || {});
     setIsEditing(false);
   };
-
-  console.log(form);
-  
 
   return (
     <EditableSection
@@ -148,20 +141,18 @@ export default function ProfileNameSection({
               />
             </div>
             <div className="col-md-2">
-              {form.profilePic && (
-                <img
-                  src={
-                    form.profilePic instanceof File
-                      ? URL.createObjectURL(form.profilePic)
-                      : (form.profilePic as string)
-                  }
-                  alt="Profile"
-                  className="img-fluid rounded-circle"
-                  style={{
-                    transform: "translate(-10%, -20%)",
-                  }}
-                />
-              )}
+              <img
+                src={
+                  form.profilePic instanceof File
+                    ? URL.createObjectURL(form.profilePic)
+                    : (form.profilePic as string)
+                }
+                alt="Profile"
+                className="img-fluid rounded-circle"
+                style={{
+                  transform: "translate(-10%, -20%)",
+                }}
+              />
             </div>
           </div>
         </div>

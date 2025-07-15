@@ -16,18 +16,19 @@ type Document = {
 
 type DocumentSectionProps = {
   userInfo: any;
-  userId: string;
 };
 
 export default function ProfileDocumentSection({
   userInfo,
-  userId,
 }: DocumentSectionProps) {
   const dispatch = useDispatch<AppDispatch>();
   const [isEditing, setIsEditing] = useState(false);
   const documents = useSelector((state: any) => state.userInfo.documents);
 
+  
+  
   const [parseDocuments, setParseDocuments] = useState<Document[]>([]);
+  console.log("Documents:", parseDocuments);
 
   useEffect(() => {
     const fetchSignedUrls = async () => {
@@ -41,15 +42,13 @@ export default function ProfileDocumentSection({
 
   const handleSave = async () => {
     try {
-      await axiosApi.put(`/api/users/me?userId=${userId}`, {
-        documents,
-      });
+      await axiosApi.put("/api/users/me", documents);
       toast.success("Document section saved successfully!");
       setIsEditing(false);
     } catch (error) {
       toast.error("Failed to save document section");
     }
-  };    
+  };
 
   return (
     <EditableSection

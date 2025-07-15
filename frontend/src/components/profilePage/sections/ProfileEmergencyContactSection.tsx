@@ -12,12 +12,10 @@ import { fetchUserInfo, updateUserInfo } from "../../../store/slices/userInfoSli
 // firstName, lastName, middleName, phone, email, relationship
 interface EmergencyContactSectionProps {
   userInfo: UserInfo | null;
-  userId: string;
 }
 
 export default function ProfileEmergencyContactSection({
   userInfo,
-  userId,
 }: EmergencyContactSectionProps) {
   const dispatch = useDispatch<AppDispatch>();
   const [isEditing, setIsEditing] = useState(false);

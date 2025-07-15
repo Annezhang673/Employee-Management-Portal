@@ -16,12 +16,10 @@ export type ContactInfo = {
 
 interface ContactInfoSectionProps {
   userInfo: UserInfo | null;
-  userId: string;
 }
 
 export default function ProfileContactInfoSection({
   userInfo,
-  userId,
 }: ContactInfoSectionProps) {
   const dispatch = useDispatch<AppDispatch>();
   const [isEditing, setIsEditing] = useState(false);
@@ -30,7 +28,6 @@ export default function ProfileContactInfoSection({
     cellPhone: userInfo?.cellPhone,
     workPhone: userInfo?.workPhone,
   });
-
 
   const handleSave = async () => {
     try {

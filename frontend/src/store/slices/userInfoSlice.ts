@@ -24,14 +24,26 @@ interface UserApiResponse {
 
 export const fetchUserInfo = createAsyncThunk("userInfo/fetch", async () => {
   const response = await axiosApi.get<UserApiResponse>("/api/users/me");
-
   return response.data || null;
 });
 
 export const updateUserInfo = createAsyncThunk(
   "userInfo/update",
   async (data: Partial<UserInfo>) => {
-    const response = await axiosApi.put<UserInfo>(`/api/users/me`, data);
+    // data might contains file
+    const formData = new FormData();
+
+    const { profilePic, ...rest } = data;
+
+    formData.append("data", JSON.stringify(rest));
+
+    if (profilePic) formData.append("profilePic", profilePic);
+
+    const response = await axiosApi.put<UserInfo>(`/api/users/me`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return response.data;
   }
 );
@@ -74,9 +86,10 @@ const userInfoSlice = createSlice({
       .addCase(fetchUserInfo.fulfilled, (state, action) => {
         const user = action.payload.user;
         const application = action.payload.application[0];
+        const profilePicUrl = user.profilePicUrl || null;
         state.userInfo = {
           ...application.data,
-          profilePic: user.profilePicUrl || null,
+          profilePic: profilePicUrl,
         };
 
         state.documents = application.documents || [];
