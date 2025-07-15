@@ -9,19 +9,20 @@ interface ApplicationResponse {
 }
 
 interface UserApiResponse {
-  user: any;
-  applications: ApplicationResponse[];
+  user: UserInfo;
+  application: ApplicationResponse[];
 }
 
 export const fetchUserInfo = createAsyncThunk("userInfo/fetch", async () => {
   const mockId = "68730bb6ffbffeea6daaf227";
   const response = await axiosApi.get<UserApiResponse>("/api/users/me", {
     params: { userId: mockId },
-  });
+  });  
 
-  const application = response.data.applications?.[0];
+  // console.log(response.data);
+  
 
-  return application?.data || null;
+  return response.data || null;
 });
 
 export const updateUserInfo = createAsyncThunk(
@@ -38,12 +39,14 @@ export const updateUserInfo = createAsyncThunk(
 
 type UserInfoState = {
   userInfo: UserInfo | null;
+  documents: any[];
   isLoading: boolean;
   error: string | null;
 };
 
 const initialState: UserInfoState = {
   userInfo: null,
+  documents: [],
   isLoading: false,
   error: null,
 };
@@ -70,7 +73,8 @@ const userInfoSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(fetchUserInfo.fulfilled, (state, action) => {
-        state.userInfo = action.payload;
+        state.userInfo = action.payload.application[0]?.data || null;
+        state.documents = action.payload.application[0]?.documents || [];
         state.isLoading = false;
       })
 

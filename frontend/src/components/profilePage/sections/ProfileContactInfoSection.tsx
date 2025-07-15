@@ -1,8 +1,13 @@
 import { useState } from "react";
 import EditableSection from "../EditableSection";
 import toast from "react-hot-toast";
-import axiosApi from "../../../lib/axiosApi";
 import { UserInfo } from "../../../pages/OnboardingPage";
+import { AppDispatch } from "../../../store/store";
+import { useDispatch } from "react-redux";
+import {
+  fetchUserInfo,
+  updateUserInfo,
+} from "../../../store/slices/userInfoSlice";
 
 export type ContactInfo = {
   cellPhone: string;
@@ -10,26 +15,33 @@ export type ContactInfo = {
 };
 
 interface ContactInfoSectionProps {
-  form: Partial<ContactInfo>;
-  setForm: React.Dispatch<React.SetStateAction<Partial<ContactInfo>>>;
   userInfo: UserInfo | null;
   userId: string;
 }
 
 export default function ProfileContactInfoSection({
-  form,
-  setForm,
   userInfo,
   userId,
 }: ContactInfoSectionProps) {
+  const dispatch = useDispatch<AppDispatch>();
   const [isEditing, setIsEditing] = useState(false);
+
+  const [form, setForm] = useState<Partial<ContactInfo>>({
+    cellPhone: userInfo?.cellPhone,
+    workPhone: userInfo?.workPhone,
+  });
+
 
   const handleSave = async () => {
     try {
-      await axiosApi.put(`/api/users/me?userId=${userId}`, {
+      const payload = {
         cellPhone: form.cellPhone,
         workPhone: form.workPhone,
-      });
+      };
+
+      await dispatch(updateUserInfo(payload));
+      await dispatch(fetchUserInfo());
+
       toast.success("Contact info saved successfully!");
       setIsEditing(false);
     } catch (err) {

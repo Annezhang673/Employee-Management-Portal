@@ -3,33 +3,48 @@ import type { UserInfo, VisaInfo } from "../../../pages/OnboardingPage";
 import toast from "react-hot-toast";
 import axiosApi from "../../../lib/axiosApi";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../store/store";
+import { fetchUserInfo, updateUserInfo } from "../../../store/slices/userInfoSlice";
 
 interface EmploymentSectionProps {
-  form: Partial<UserInfo>;
-  setForm: React.Dispatch<React.SetStateAction<Partial<UserInfo>>>;
-  userInfo: UserInfo | null;
+  userInfo: UserInfo;
   userId: string;
 }
 
 export default function ProfileEmploymentSection({
-  form,
-  setForm,
   userInfo,
   userId,
 }: EmploymentSectionProps) {
+  const dispatch = useDispatch<AppDispatch>();
   const [isEditing, setIsEditing] = useState(false);
+  const [form, setForm] = useState<Partial<UserInfo>>({
+    visa: {
+      type: userInfo?.visa?.type,
+      startDate: userInfo?.visa?.startDate,
+      endDate: userInfo?.visa?.endDate,
+    },
+  })
 
-  const visa: VisaInfo = form.visa as VisaInfo;
-
+  
   const handleSave = async () => {
     try {
-      await axiosApi.put(`/api/users/me?userId=${userId}`, {
+      const payload = {
         visa: {
-          type: visa?.type,
-          startDate: visa?.startDate,
-          endDate: visa?.endDate,
+          type: form.visa?.type,
+          startDate: form.visa?.startDate,
+          endDate: form.visa?.endDate,
         },
-      });
+      };
+
+      await dispatch(updateUserInfo(payload as UserInfo));
+      await dispatch(fetchUserInfo());
+      if (form.visa?.file) {
+        const formData = new FormData();
+        formData.append("file", form.visa.file);
+        await axiosApi.post(`/users/${userId}/visa`, formData);
+      }
+      
       toast.success("Employment section saved successfully!");
       setIsEditing(false);
     } catch (error) {

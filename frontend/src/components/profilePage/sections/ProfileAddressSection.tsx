@@ -1,44 +1,74 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Address, UserInfo } from "../../../pages/OnboardingPage";
 import EditableSection from "../EditableSection";
 import axiosApi from "../../../lib/axiosApi";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../store/store";
+import {
+  fetchUserInfo,
+  updateUserInfo,
+} from "../../../store/slices/userInfoSlice";
 
 interface AddressSectonProps {
-  form: Partial<UserInfo>;
-  setForm: React.Dispatch<React.SetStateAction<Partial<UserInfo>>>;
   userInfo: UserInfo | null;
   userId: string;
 }
 
 // Building/apt#, street name, city, state, zip
 export default function ProfileAddressSection({
-  form,
-  setForm,
   userInfo,
   userId,
 }: AddressSectonProps) {
+  const dispatch = useDispatch<AppDispatch>();
   const [isEditing, setIsEditing] = useState(false);
+  const [form, setForm] = useState<Partial<UserInfo>>({
+    address: {
+      building: "",
+      street: "",
+      city: "",
+      state: "",
+      zip: "",
+    },
+  });
 
-  const address: Address = form.address ?? {
-    building: "",
-    street: "",
-    city: "",
-    state: "",
-    zip: "",
+  const address: Address = {
+    building: form.address?.building || "",
+    street: form.address?.street || "",
+    city: form.address?.city || "",
+    state: form.address?.state || "",
+    zip: form.address?.zip || "",
   };
+
+  useEffect(() => {
+    if (userInfo) {
+      setForm({
+        address: {
+          building: userInfo.address?.building || "",
+          street: userInfo.address?.street || "",
+          city: userInfo.address?.city || "",
+          state: userInfo.address?.state || "",
+          zip: userInfo.address?.zip || "",
+        },
+      });
+    }
+  }, [userInfo]);
 
   const handleSave = async () => {
     try {
-      await axiosApi.put(`/api/users/me?userId=${userId}`, {
+      const payload = {
         address: {
-          building: address?.building,
-          street: address?.street,
-          city: address?.city,
-          state: address?.state,
-          zip: address?.zip,
+          building: form.address?.building || "",
+          street: form.address?.street || "",
+          city: form.address?.city || "",
+          state: form.address?.state || "",
+          zip: form.address?.zip || "",
         },
-      });
+      };
+
+      await dispatch(updateUserInfo(payload as UserInfo));
+      await dispatch(fetchUserInfo());
+      
 
       toast.success("Address section saved successfully!");
       setIsEditing(false);
