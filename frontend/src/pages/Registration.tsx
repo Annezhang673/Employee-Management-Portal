@@ -5,6 +5,7 @@ import axiosApi from "../lib/axiosApi";
 import "bootstrap/dist/css/bootstrap.min.css";
 import registrationCover from "../assets/images/registrationCover.jpeg";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export default function RegistrationPage() {
   // when page loads, check if token is valid, else redirect
@@ -12,24 +13,48 @@ export default function RegistrationPage() {
 
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState<string | null>(null);
+  const [valid, setValid]     = useState(false);
+
   // pull token from url
   const token = window.location.href.split("/").pop();
-  useEffect(() => {
-    const validateToken = async () => {
-      // const response = await fetch(
-      //   `http://localhost:8080/api/tokens/validate/${token}`
-      // );
-      // const data = await response.json();
-      const response = await axiosApi.get<{ valid: boolean}>(`/api/tokens/validate/${token}`);
-      const data = response.data;
+  // useEffect(() => {
+  //   const validateToken = async () => {
+  //     // const response = await fetch(
+  //     //   `http://localhost:8080/api/tokens/validate/${token}`
+  //     // );
+  //     // const data = await response.json();
+  //     const response = await axiosApi.get<{ valid: boolean}>(`/api/tokens/validate/${token}`);
+  //     const data = response.data;
 
-      if (!data || !data.valid) {
-        // window.location.href = "http://localhost:3000/";
-        window.location.href = process.env.REACT_APP_API_URL || "/";
+  //     if (!data || !data.valid) {
+  //       // window.location.href = "http://localhost:3000/";
+  //       window.location.href = process.env.REACT_APP_API_URL || "/";
+  //     }
+  //   };
+
+  //   validateToken();
+  // }, [token]);
+
+  useEffect(() => {
+    const checkToken = async () => {
+      try {
+        // now, “validate” → “check”
+        const res = await axiosApi.get<{ valid: boolean; email: string }>(
+          `/api/tokens/check/${token}`
+        );
+        // pre-fill the email:
+        setFormData(f => ({ ...f, email: res.data.email }));
+        setValid(true);
+      } catch (e: any) {
+        setError(e.response?.data?.error || "Invalid or expired link.");
+      } finally {
+        setLoading(false);
       }
     };
 
-    validateToken();
+    checkToken();
   }, [token]);
 
   type FormData = {
@@ -53,31 +78,55 @@ export default function RegistrationPage() {
     });
   };
 
+  // const handleSubmit = async (e: any) => {
+  //   e.preventDefault();
+
+  //   // send form data to backend to register
+  //   // const response = await axios.post(
+  //   //   "http://localhost:8080/api/auth/register",
+  //   //   formData,
+  //   //   {
+  //   //     headers: {
+  //   //       "Content-Type": "application/json",
+  //   //     },
+  //   //   }
+  //   // );
+  //   const response = await axiosApi.post("/api/auth/register", formData, {
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //   });
+
+  //   const data = await response.data;
+
+  //   if (data.success) {
+  //     navigate("/login");
+  //   }
+  // };
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-
-    // send form data to backend to register
-    // const response = await axios.post(
-    //   "http://localhost:8080/api/auth/register",
-    //   formData,
-    //   {
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //   }
-    // );
-    const response = await axiosApi.post("/api/auth/register", formData, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    const data = await response.data;
-
-    if (data.success) {
+    try {
+      // when they actually register, consume/mark-used
+      await axiosApi.post(
+        `/api/tokens/validate/${token}`,
+        formData,
+        { headers: { "Content-Type": "application/json" } }
+      );
       navigate("/login");
+    } catch (e: any) {
+      // show validation error if e.g. token expired mid-form
+      toast.error(e.response?.data?.error || "Registration failed.");
     }
   };
+
+  if (loading) {
+    return <p>Checking registration link…</p>;
+  }
+
+  if (error) {
+    return <p className="text-danger">{error}</p>;
+  }
 
   return (
     <div

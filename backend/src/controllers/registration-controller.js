@@ -21,6 +21,18 @@ export const generateAndSendToken = async (req, res) => {
   }
 };
 
+// Only verify token status, don't mutate any data
+export const checkToken = async (req, res) => {
+  const { token } = req.params;
+
+  const tokenDoc = await RegistrationToken.findOne({ token });
+  
+  if (!tokenDoc || tokenDoc.used || tokenDoc.expiresAt < Date.now()) {
+    return res.status(400).json({ error: "Invalid or expired token" });
+  }
+  return res.status(200).json({ email: tokenDoc.email, valid: true });
+}
+
 // validate token
 export const validateToken = async (req, res) => {
   try {
