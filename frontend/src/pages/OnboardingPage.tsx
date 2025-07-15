@@ -107,7 +107,9 @@ export default function OnboardingPage() {
   // if user is already submitted, or application is approved, redirect
   // onboarding.onboarding is a single object which contains the entire application
   useEffect(() => {
-    const applicatonStatus = (onboarding.onboarding as any)?.status;
+    const applicatonStatus = (
+      onboarding.onboarding as any
+    )?.status?.toLowerCase();
     if (submitted && applicatonStatus?.toLowerCase() === "approved") {
       navigate(`/app/dashboard`);
     }
@@ -255,10 +257,6 @@ export default function OnboardingPage() {
       }));
     }
   }, [onboarding.onboarding, submitted]);
-
-  useEffect(() => {
-    dispatch(fetchOnboarding());
-  }, [dispatch]);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

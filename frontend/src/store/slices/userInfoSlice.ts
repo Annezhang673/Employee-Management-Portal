@@ -23,10 +23,7 @@ interface UserApiResponse {
 }
 
 export const fetchUserInfo = createAsyncThunk("userInfo/fetch", async () => {
-  const mockId = "68730bb6ffbffeea6daaf227";
-  const response = await axiosApi.get<UserApiResponse>("/api/users/me", {
-    params: { userId: mockId },
-  });
+  const response = await axiosApi.get<UserApiResponse>("/api/users/me");
 
   return response.data || null;
 });
@@ -34,12 +31,7 @@ export const fetchUserInfo = createAsyncThunk("userInfo/fetch", async () => {
 export const updateUserInfo = createAsyncThunk(
   "userInfo/update",
   async (data: Partial<UserInfo>) => {
-    const mockId = "68730bb6ffbffeea6daaf227";
-    
-    const response = await axiosApi.put<UserInfo>(
-      `/api/users/me?userId=${mockId}`,
-      data
-    );
+    const response = await axiosApi.put<UserInfo>(`/api/users/me`, data);
     return response.data;
   }
 );
@@ -85,7 +77,7 @@ const userInfoSlice = createSlice({
         state.userInfo = {
           ...application.data,
           profilePic: user.profilePicUrl || null,
-        };    
+        };
 
         state.documents = application.documents || [];
         state.isLoading = false;

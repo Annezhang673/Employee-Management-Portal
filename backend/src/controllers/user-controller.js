@@ -5,7 +5,7 @@ import Application from "../models/application_model.js";
 export const getUserProfile = async (req, res) => {
   try {
     // getting the user id from mongoose User Schema
-    const userId = req?.user?._id || req.query.userId;
+    const userId = req.user?.userId;
     const user = await User.findById(userId);
 
     if (!user) {
@@ -27,10 +27,7 @@ export const getUserProfile = async (req, res) => {
 // Put api/users/me
 export const updateUserProfile = async (req, res) => {
   try {
-    // pull the required fields, might have more, will adjust as needed
-    //  req.body will contails partial application data, which user contains application id
-
-    const userId = req?.user?._id || req.query.userId;
+    const userId = req.user?.userId; // userId from middleware
     const user = await User.findById(userId);
 
     if (!user) {
