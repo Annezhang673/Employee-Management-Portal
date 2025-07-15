@@ -62,7 +62,7 @@ export type UserInfo = {
   lastName: string;
   middleName: string;
   preferredName: string;
-  profilePic: File | null;
+  profilePic: File | string | null;
 
   address: Address;
   cellPhone: string;
@@ -197,8 +197,8 @@ export default function OnboardingPage() {
     const docs = (onboarding.onboarding as any).documents || [];
     const documentMap: { [key: string]: string } = {};
     docs.forEach((doc: any) => {
-      if (doc.url) {
-        documentMap[doc.name] = doc.url;
+      if (doc.previewUrl) {
+        documentMap[doc.name] = doc.previewUrl;
       }
     });
     setDocumentURLs(documentMap);
@@ -1004,7 +1004,7 @@ export default function OnboardingPage() {
                 <ul className="list-group">
                   <FilePreviewItem
                     label="Profile Picture"
-                    file={formData.profilePic}
+                    file={formData.profilePic as File | null}
                   />
                   <FilePreviewItem
                     label="Driver License"

@@ -23,6 +23,7 @@ export default function ProfileNameSection({
   const [isEditing, setIsEditing] = useState(false);
 
   const [form, setForm] = useState<Partial<UserInfo>>({
+    profilePic: userInfo?.profilePic,
     firstName: userInfo?.firstName,
     lastName: userInfo?.lastName,
     middleName: userInfo?.middleName,
@@ -36,6 +37,7 @@ export default function ProfileNameSection({
   useEffect(() => {
     if (userInfo) {
       setForm({
+        profilePic: userInfo.profilePic,
         firstName: userInfo.firstName,
         lastName: userInfo.lastName,
         middleName: userInfo.middleName,
@@ -51,6 +53,7 @@ export default function ProfileNameSection({
   const handleSave = async () => {
     try {
       const payload = {
+        profilePic: form.profilePic,
         firstName: form.firstName,
         lastName: form.lastName,
         middleName: form.middleName,
@@ -63,7 +66,7 @@ export default function ProfileNameSection({
 
       await dispatch(updateUserInfo(payload));
       await dispatch(fetchUserInfo());
-      
+
       toast.success("Name section saved successfully!");
       setIsEditing(false);
     } catch (err) {
@@ -76,6 +79,9 @@ export default function ProfileNameSection({
     setForm(userInfo || {});
     setIsEditing(false);
   };
+
+  console.log(form);
+  
 
   return (
     <EditableSection
@@ -123,6 +129,41 @@ export default function ProfileNameSection({
               setForm({ ...form, preferredName: e.target.value })
             }
           />
+        </div>
+        <div className="col-md-6 mb-2">
+          <label className="form-label">Profile Picture</label>
+          <div className="row">
+            <div className="col-md-10">
+              <input
+                className="form-control"
+                disabled={!isEditing}
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    profilePic: e.target.files?.[0],
+                  })
+                }
+              />
+            </div>
+            <div className="col-md-2">
+              {form.profilePic && (
+                <img
+                  src={
+                    form.profilePic instanceof File
+                      ? URL.createObjectURL(form.profilePic)
+                      : (form.profilePic as string)
+                  }
+                  alt="Profile"
+                  className="img-fluid rounded-circle"
+                  style={{
+                    transform: "translate(-10%, -20%)",
+                  }}
+                />
+              )}
+            </div>
+          </div>
         </div>
         <div className="col-md-6 mb-2">
           <label className="form-label">Email</label>

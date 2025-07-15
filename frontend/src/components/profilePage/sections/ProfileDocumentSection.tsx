@@ -10,7 +10,8 @@ type Document = {
   _id: string;
   name: string;
   s3Key: string;
-  url: string;
+  previewUrl: string;
+  downloadUrl: string;
 };
 
 type DocumentSectionProps = {
@@ -28,24 +29,11 @@ export default function ProfileDocumentSection({
 
   const [parseDocuments, setParseDocuments] = useState<Document[]>([]);
 
-
   useEffect(() => {
     const fetchSignedUrls = async () => {
-      const updated = await Promise.all(
-        documents.map(async (doc: { s3Key: any; }) => {
-          try {
-            const res = await axiosApi.get(
-              `/api/s3/signed-url?key=${doc.s3Key}`
-            );
-            return { ...doc, url: res.data.url };
-          } catch (err) {
-            toast.error("Failed to load document URLs");
-            return doc;
-          }
-        })
-      );
-
-      setParseDocuments(updated);
+      const res = await axiosApi.get("/api/onboarding");
+      const signedDocs = res.data.documents || [];
+      setParseDocuments(signedDocs);
     };
 
     if (!isEditing) fetchSignedUrls();
@@ -61,7 +49,7 @@ export default function ProfileDocumentSection({
     } catch (error) {
       toast.error("Failed to save document section");
     }
-  };
+  };    
 
   return (
     <EditableSection
@@ -74,17 +62,39 @@ export default function ProfileDocumentSection({
       {/* Show list of ducuments, Employee able to download, open preview */}
       <div className="list-group">
         {parseDocuments.length > 0 ? (
-          parseDocuments.map((doc, index) => (
-            <a
-              key={index}
-              href={doc.url}
-              className="list-group-item list-group-item-action"
-              target="_blank"
-              rel="noreferrer"
-            >
-              {doc.name}
-            </a>
-          ))
+          <ul className="list-group">
+            {parseDocuments.map((doc, index) => (
+              <li
+                key={doc._id}
+                className="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                style={{ cursor: "default" }}
+              >
+                <span className="fw-bold">{doc.name}</span>
+                <div className="btn-group btn-group-sm">
+                  <button
+                    className="btn btn-outline-primary"
+                    onClick={() => window.open(doc.previewUrl, "_blank")}
+                  >
+                    Preview
+                  </button>
+                  <button
+                    className="btn btn-outline-secondary"
+                    onClick={() => {
+                      const link = document.createElement("a");
+                      link.href = doc.downloadUrl;
+                      link.download = doc.name;
+                      document.body.appendChild(link);
+                      link.target = "_blank";
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                  >
+                    Download
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
         ) : (
           <p className="text-muted">No documents available.</p>
         )}

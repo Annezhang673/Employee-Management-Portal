@@ -2,6 +2,15 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axiosApi from "../../lib/axiosApi";
 import type { UserInfo } from "../../pages/OnboardingPage";
 
+interface User {
+  _id: string;
+  userName: string;
+  email: string;
+  profilePicUrl: string | null;
+  role: string;
+  house: string;
+}
+
 interface ApplicationResponse {
   _id: string;
   data: UserInfo;
@@ -9,7 +18,7 @@ interface ApplicationResponse {
 }
 
 interface UserApiResponse {
-  user: UserInfo;
+  user: User;
   application: ApplicationResponse[];
 }
 
@@ -17,10 +26,7 @@ export const fetchUserInfo = createAsyncThunk("userInfo/fetch", async () => {
   const mockId = "68730bb6ffbffeea6daaf227";
   const response = await axiosApi.get<UserApiResponse>("/api/users/me", {
     params: { userId: mockId },
-  });  
-
-  // console.log(response.data);
-  
+  });
 
   return response.data || null;
 });
@@ -29,6 +35,7 @@ export const updateUserInfo = createAsyncThunk(
   "userInfo/update",
   async (data: Partial<UserInfo>) => {
     const mockId = "68730bb6ffbffeea6daaf227";
+    
     const response = await axiosApi.put<UserInfo>(
       `/api/users/me?userId=${mockId}`,
       data
@@ -73,8 +80,14 @@ const userInfoSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(fetchUserInfo.fulfilled, (state, action) => {
-        state.userInfo = action.payload.application[0]?.data || null;
-        state.documents = action.payload.application[0]?.documents || [];
+        const user = action.payload.user;
+        const application = action.payload.application[0];
+        state.userInfo = {
+          ...application.data,
+          profilePic: user.profilePicUrl || null,
+        };    
+
+        state.documents = application.documents || [];
         state.isLoading = false;
       })
 

@@ -94,8 +94,9 @@ export const submitOnboardingApplication = async (req, res) => {
 
     const profileDoc = mergedDocuments.find((doc) => doc.name === "profilePic");
     if (profileDoc) {
-      const profileUrl = await getSignedFileURL(profileDoc.s3Key);
-      userUpdate.profilePic = profileUrl;
+      
+      const { previewUrl } = await getSignedFileURL(profileDoc.s3Key);
+      userUpdate.profilePicUrl = previewUrl;
     }
 
     if (parseData.visa?.type) {
@@ -106,6 +107,9 @@ export const submitOnboardingApplication = async (req, res) => {
       ...userUpdate,
       visaDocs: visaDocs,
     });
+
+    const updatedUser = await User.findById(userId)
+    
 
     const signedDocuments = await Promise.all(
       updatedApp.documents.map(async (doc) => {
@@ -147,10 +151,11 @@ export const viewOnboardingApplication = async (req, res) => {
 
     const signedDocuments = await Promise.all(
       application[0].documents.map(async (doc) => {
-        const signedUrl = await getSignedFileURL(doc.s3Key);
+        const { previewUrl, downloadUrl } = await getSignedFileURL(doc.s3Key);
         return {
           ...doc.toObject(),
-          url: signedUrl,
+          previewUrl,
+          downloadUrl,
         };
       })
     );
