@@ -5,7 +5,7 @@ import { getSignedFileURL, uploadFileToS3 } from "../lib/s3.js";
 // api/onboarding
 export const submitOnboardingApplication = async (req, res) => {
   try {
-    const userId = req?.user?._id;
+    const userId = req?.user?.id || req.params.userId;
     const rawData = req.body.data;
 
     if (!rawData) {
@@ -129,7 +129,7 @@ export const submitOnboardingApplication = async (req, res) => {
 // get current latest onboarding application for user
 export const viewOnboardingApplication = async (req, res) => {
   try {
-    const userId = req.user?._id;
+    const userId = req.user?._id || req.params.userId;
 
     const application = await Application.find({ user: userId });
 

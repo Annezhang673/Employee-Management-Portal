@@ -6,8 +6,8 @@ import { uploadFileToS3, getSignedFileURL } from "../lib/s3.js";
 export const getUserProfile = async (req, res) => {
   try {
     // getting the user id from mongoose User Schema
-    const userId = req.user?.userId;
-    const user = await User.findById(userId);
+    const userId = req.user?.id;
+    const user = await User.findById(userId);    
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -20,8 +20,8 @@ export const getUserProfile = async (req, res) => {
 
     let signedProfilePicUrl = null;
     if (user.profilePicUrl) {
-      const {previewUrl} = await getSignedFileURL(user.profilePicUrl);
-      signedProfilePicUrl = previewUrl
+      const { previewUrl } = await getSignedFileURL(user.profilePicUrl);
+      signedProfilePicUrl = previewUrl;
     }
 
     res.status(200).json({ user, application, signedProfilePicUrl });
