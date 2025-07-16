@@ -1,8 +1,11 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
-import { RootState } from "../../store/store";
+import { AppDispatch, RootState } from "../../store/store";
+import { useEffect } from "react";
+import { fetchOnboarding } from "../../store/slices/onboardingSlice";
 
 export default function EmployeeNavigation() {
+  const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
 
   const isActive = (path: string) =>
@@ -13,6 +16,10 @@ export default function EmployeeNavigation() {
   const submitted = useSelector(
     (state: RootState) => state.onboarding.submitted
   );
+
+  useEffect(() => {
+    dispatch(fetchOnboarding());
+  }, [dispatch]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
