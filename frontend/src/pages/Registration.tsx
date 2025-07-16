@@ -14,6 +14,10 @@ export default function RegistrationPage() {
 
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState<string | null>(null);
+  const [valid, setValid]     = useState(false);
+
   // clear all local storage
   useEffect(() => {
     localStorage.clear();
@@ -21,21 +25,46 @@ export default function RegistrationPage() {
 
   // pull token from url
   const token = window.location.href.split("/").pop();
+
+  // useEffect(() => {
+  //   const validateToken = async () => {
+  //     try {
+  //       const response = await axiosApi.get<{ valid: boolean }>(
+  //         `/api/tokens/validate/${token}`
+  //       );
+  //       const data = response.data;
+
+  //       const res = await axiosApi.get<{ valid: boolean; email: string }>(
+  //         `/api/tokens/check/${token}`
+  //       );
+  //       // pre-fill the email:
+  //       setFormData(f => ({ ...f, email: res.data.email }));
+  //       setValid(true); // dev----> what is setValid for?
+        
+  //       setTokenValid(data.valid);
+  //     } catch (error) {
+  //       setTokenValid(false);
+  //     }
+  //   };
+
+  //   validateToken();
+  // }, [token, navigate, setTokenValid]);
+
   useEffect(() => {
-    const validateToken = async () => {
+    const check = async () => {
       try {
-        const response = await axiosApi.get<{ valid: boolean }>(
-          `/api/tokens/validate/${token}`
-        );
-        const data = response.data;
-        setTokenValid(data.valid);
-      } catch (error) {
-        setTokenValid(false);
+        const { data } = await axiosApi.get<{ valid: boolean; email: string }>(`/api/tokens/check/${token}`);
+        if (!data.valid) throw new Error("Invalid token");
+        setFormData(f => ({ ...f, email: data.email }));
+        setTokenValid(true);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
-
-    validateToken();
-  }, [token, navigate, setTokenValid]);
+    check();
+  }, [token]);
 
   type FormData = {
     email: string;
@@ -57,6 +86,32 @@ export default function RegistrationPage() {
       [e.target.name]: e.target.value,
     });
   };
+
+  // const handleSubmit = async (e: any) => {
+  //   e.preventDefault();
+
+  //   // send form data to backend to register
+  //   // const response = await axios.post(
+  //   //   "http://localhost:8080/api/auth/register",
+  //   //   formData,
+  //   //   {
+  //   //     headers: {
+  //   //       "Content-Type": "application/json",
+  //   //     },
+  //   //   }
+  //   // );
+  //   const response = await axiosApi.post("/api/auth/register", formData, {
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //   });
+
+  //   const data = await response.data;
+
+  //   if (data.success) {
+  //     navigate("/login");
+  //   }
+  // };
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -86,6 +141,14 @@ export default function RegistrationPage() {
       console.error(error);
     }
   };
+
+  if (loading) {
+    return <p>Checking registration link…</p>;
+  }
+
+  if (error) {
+    return <p className="text-danger">{error}</p>;
+  }
 
   return (
     <div
