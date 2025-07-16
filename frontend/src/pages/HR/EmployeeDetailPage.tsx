@@ -72,106 +72,149 @@ type Employee = {
 
 export default function EmployeeDetailPage() {
    const { userId } = useParams<{ userId: string }>();
-   const [emp, setEmp]       = useState<Employee | null>(null);
+   const [emp, setEmp] = useState<Employee | null>(null);
    const [loading, setLoading] = useState(true);
-   const [error, setError]     = useState<string | null>(null);
+   const [error, setError] = useState<string | null>(null);
 
    useEffect(() => {
       if (!userId) return;
       setLoading(true);
-
-      axiosApi.get<Employee>(`/api/users/${userId}`)
-         .then(res => {
+      axiosApi
+         .get<Employee>(`/api/users/${userId}`)
+         .then((res) => {
          setEmp(res.data);
          setError(null);
          })
-         .catch(err => {
-         setError(err.response?.data?.error || err.message);
+         .catch((err) => {
+         setError(err.response?.data?.message || err.message);
          })
          .finally(() => setLoading(false));
    }, [userId]);
 
    if (loading) return <p>Loading…</p>;
-   if (error)   return <p className="text-danger">Error: {error}</p>;
-   if (!emp)    return <p>Employee not found.</p>;
+   if (error) return <div className="alert alert-danger">Error: {error}</div>;
+   if (!emp) return <p>Employee not found.</p>;
 
    const d = emp.application?.data;
 
    return (
-      <div className="container py-4">
-         {/* --- Basic Profile --- */}
-         <h2 className="mb-3">
-         {d?.firstName || emp.firstName || ""}{" "}
-         {d?.middleName || ""}{" "}
-         {d?.lastName || emp.lastName || ""}
-         {d?.preferredName ? ` (${d.preferredName})` : ""}
-         </h2>
-         <p><strong>Username:</strong> {emp.userName}</p>
-         <p><strong>Email:</strong> {emp.email}</p>
-         <p><strong>Phone:</strong> {d?.cellPhone || emp.phone || "—"}</p>
-         <p><strong>SSN:</strong> {d?.ssn || emp.ssn || "—"}</p>
-         <p><strong>Work Auth:</strong> {emp.workAuthTitle || d?.citizenstatus || "—"}</p>
-
-         {/* --- Address --- */}
-         <div className="mb-4">
-         <h5>Address</h5>
-         {d?.address ? (
-            <>
-               <p>{d.address.building}, {d.address.street}</p>
-               <p>{d.address.city}, {d.address.state} {d.address.zip}</p>
-            </>
-         ) : <p>—</p>}
-         </div>
-
-         {/* --- Car Info --- */}
-         <div className="mb-4">
-         <h5>Car Information</h5>
-         <p>
-            {d?.car?.make || "—"}{" "}
-            {d?.car?.model || ""}  
-            ({d?.car?.color || "—"})
-         </p>
-         </div>
-
-         {/* --- Referral --- */}
-         <div className="mb-4">
-         <h5>Referral</h5>
-         {d?.referral?.firstName ? (
-            <p>
-               {d.referral.firstName} {d.referral.middleName} {d.referral.lastName}<br/>
-               {d.referral.relationship}<br/>
-               {d.referral.phone}<br/>
-               {d.referral.email}
-            </p>
-         ) : <p>—</p>}
-         </div>
-
-         {/* --- Emergency Contacts --- */}
-         <div className="mb-4">
-         <h5>Emergency Contacts</h5>
-         {d?.emergencyContact?.length ? (
-            d.emergencyContact.map((c, i) => (
-               <div key={i} className="border p-2 mb-2">
-               <strong>
-                  {c.firstName} {c.middleName} {c.lastName}
-               </strong><br/>
-               {c.relationship}<br/>
-               {c.phone} / {c.email}
-               </div>
-            ))
-         ) : <p>—</p>}
-         </div>
-
-         {/* --- Application Status & Feedback --- */}
-         <div className="mb-4">
-         <h5>Application Status</h5>
-         <p>{emp.application?.status || "—"}</p>
-         {emp.application?.status === "Rejected" && (
-            <>
-               <h6>Feedback</h6>
-               <p>{emp.application.feedback}</p>
-            </>
+      <div className="container my-4">
+         {/* Header with Avatar */}
+         <div className="d-flex align-items-center mb-4">
+         {emp.profilePicUrl && (
+            <img
+               src={emp.profilePicUrl}
+               alt="Avatar"
+               className="rounded-circle me-3 shadow"
+               style={{ width: 80, height: 80, objectFit: "cover" }}
+            />
          )}
+         <h2 className="mb-0">
+            {d?.firstName || emp.firstName}{" "}
+            {d?.lastName || emp.lastName}{" "}
+            {d?.preferredName && <small className="text-muted">({d.preferredName})</small>}
+         </h2>
+         </div>
+
+         {/* Two-Column Grid */}
+         <div className="row g-4">
+         {/* Left column: Core Info */}
+         <div className="col-md-6">
+            <div className="card shadow-sm">
+               <div className="card-body">
+               <h5 className="card-title">Core Information</h5>
+               <p><strong>Username:</strong> {emp.userName}</p>
+               <p><strong>Email:</strong> {emp.email}</p>
+               <p><strong>Phone:</strong> {d?.cellPhone || emp.phone || "—"}</p>
+               <p><strong>SSN:</strong> {d?.ssn || emp.ssn || "—"}</p>
+               <p><strong>Work Auth:</strong> {emp.workAuthTitle || d?.citizenstatus || "—"}</p>
+               </div>
+            </div>
+         </div>
+
+         {/* Right column: Onboarding Status */}
+         <div className="col-md-6">
+            <div className="card shadow-sm">
+               <div className="card-body">
+               <h5 className="card-title">Application Status</h5>
+               <p className={`badge bg-${emp.application?.status === "Approved" ? "success"
+                  : emp.application?.status === "Rejected" ? "danger"
+                  : "warning"} fs-6`}>
+                  {emp.application?.status || "—"}
+               </p>
+               {emp.application?.status === "Rejected" && (
+                  <>
+                     <h6 className="mt-3">Feedback</h6>
+                     <p className="text-muted">{emp.application.feedback}</p>
+                  </>
+               )}
+               </div>
+            </div>
+         </div>
+
+         {/* Full-width sections */}
+         <div className="col-12">
+            {/* Address & Car */}
+            <div className="row g-4">
+               <div className="col-md-6">
+               <div className="card shadow-sm">
+                  <div className="card-body">
+                     <h5 className="card-title">Address</h5>
+                     {d?.address ? (
+                     <>
+                        <p>{d.address.building}, {d.address.street}</p>
+                        <p>{d.address.city}, {d.address.state} {d.address.zip}</p>
+                     </>
+                     ) : <p className="text-muted">No address on file.</p>}
+                  </div>
+               </div>
+               </div>
+               <div className="col-md-6">
+               <div className="card shadow-sm">
+                  <div className="card-body">
+                     <h5 className="card-title">Car Information</h5>
+                     <p>
+                     {d?.car?.make || "—"} {d?.car?.model || ""}{" "}
+                     <span className="text-muted">({d?.car?.color || "—"})</span>
+                     </p>
+                  </div>
+               </div>
+               </div>
+            </div>
+         </div>
+
+         {/* Referral & Emergency Contacts */}
+         <div className="col-md-6">
+            <div className="card shadow-sm">
+               <div className="card-body">
+               <h5 className="card-title">Referral</h5>
+               {d?.referral?.firstName ? (
+                  <p>
+                     {d.referral.firstName} {d.referral.lastName}<br/>
+                     <small className="text-muted">{d.referral.relationship}</small><br/>
+                     {d.referral.phone}<br/>
+                     {d.referral.email}
+                  </p>
+               ) : <p className="text-muted">No referral provided.</p>}
+               </div>
+            </div>
+         </div>
+         <div className="col-md-6">
+            <div className="card shadow-sm">
+               <div className="card-body">
+               <h5 className="card-title">Emergency Contacts</h5>
+               {d?.emergencyContact?.length ? (
+                  d.emergencyContact.map((c, i) => (
+                     <div key={i} className="mb-3">
+                     <strong>{c.firstName} {c.lastName}</strong><br/>
+                     <small className="text-muted">{c.relationship}</small><br/>
+                     {c.phone} / {c.email}
+                     </div>
+                  ))
+               ) : <p className="text-muted">None on file.</p>}
+               </div>
+            </div>
+         </div>
          </div>
       </div>
    );
