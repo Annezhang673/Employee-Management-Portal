@@ -1,4 +1,6 @@
+import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
+import { RootState } from "../../store/store";
 
 export default function EmployeeNavigation() {
   const location = useLocation();
@@ -7,6 +9,10 @@ export default function EmployeeNavigation() {
     location.pathname === path ? "active" : "";
 
   const isLoggedIn = () => localStorage.getItem("token");
+
+  const submitted = useSelector(
+    (state: RootState) => state.onboarding.submitted
+  );
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -39,24 +45,29 @@ export default function EmployeeNavigation() {
         {/* Collapsible Menu */}
         <div className="collapse navbar-collapse" id="employeeNavbar">
           <div className="navbar-nav ms-auto">
-            <Link
-              className={`nav-link ${isActive("/app/profile")}`}
-              to="/app/profile"
-            >
-              Personal Information
-            </Link>
-            <Link
-              className={`nav-link ${isActive("/app/visa")}`}
-              to="/app/visa"
-            >
-              Visa Status Management
-            </Link>
-            <Link
-              className={`nav-link ${isActive("/app/housing")}`}
-              to="/app/housing"
-            >
-              Housing
-            </Link>
+            {submitted && (
+              <>
+                <Link
+                  className={`nav-link ${isActive("/app/profile")}`}
+                  to="/app/profile"
+                >
+                  Personal Information
+                </Link>
+                <Link
+                  className={`nav-link ${isActive("/app/visa")}`}
+                  to="/app/visa"
+                >
+                  Visa Status Management
+                </Link>
+                <Link
+                  className={`nav-link ${isActive("/app/housing")}`}
+                  to="/app/housing"
+                >
+                  Housing
+                </Link>
+              </>
+            )}
+
             <button
               className=" btn btn-outline-primary me-2"
               onClick={handleLogout}

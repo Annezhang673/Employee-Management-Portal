@@ -94,8 +94,9 @@ export default function OnboardingPage() {
   const applicationStatus = (onboarding.onboarding as any)?.status;
   const [documentURLs, setDocumentURLs] = useState<{ [key: string]: string }>(
     {}
-  );
+  );  
 
+  
   const submitted = useSelector(
     (state: RootState) => state.onboarding.submitted
   );
@@ -110,8 +111,6 @@ export default function OnboardingPage() {
     const applicatonStatus = (
       onboarding.onboarding as any
     )?.status?.toLowerCase();
-
-    console.log("applicationStatus:", applicatonStatus);
     
     if (submitted && applicatonStatus?.toLowerCase() === "approved") {
       navigate(`/app/dashboard`);

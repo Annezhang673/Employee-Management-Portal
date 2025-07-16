@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axiosApi from "../lib/axiosApi";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
 
 export default function LoginPage() {
   const [selectedRole, setSelectedRole] = useState<"HR" | "Employee" | null>(
     null
   );
+
+  const submitted = useSelector(
+    (state: RootState) => state.onboarding.submitted
+  );
+
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -15,9 +22,9 @@ export default function LoginPage() {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
 
-    if (token && role === "Employee") navigate("/app/profile");
+    if (token && role === "Employee" && submitted) navigate("/app/profile");
     if (token && role === "HR") navigate("/app/employeemanagement");
-  }, [navigate]);
+  }, [navigate, submitted]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,6 +52,7 @@ export default function LoginPage() {
       } else if (role === "Employee") {
         if (
           !applicationStatus ||
+          !submitted ||
           applicationStatus.toLowerCase() === "rejected"
         ) {
           navigate("/app/onboarding");
