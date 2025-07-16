@@ -56,7 +56,7 @@ export default function EmployeeNavigation() {
         {/* Collapsible Menu */}
         <div className="collapse navbar-collapse" id="employeeNavbar">
           <div className="navbar-nav ms-auto">
-            {submitted && onboardingStatus === "approved" && (
+            {submitted && onboardingStatus.toLowerCase() === "approved" && (
               <>
                 <Link
                   className={`nav-link ${isActive("/app/profile")}`}
