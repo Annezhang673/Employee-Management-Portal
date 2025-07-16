@@ -10,11 +10,18 @@ export default function RegistrationPage() {
   // when page loads, check if token is valid, else redirect
   // employee click tokenLink, http://localhost:3000/registration/b09a5903d0341aa5e47b31c3264729e3
 
+  const [tokenValid, setTokenValid] = useState<boolean | null>(null); // null = loading
+
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState<string | null>(null);
   const [valid, setValid]     = useState(false);
+
+  // clear all local storage
+  useEffect(() => {
+    localStorage.clear();
+  }, []);
 
   // pull token from url
   const token = window.location.href.split("/").pop();
@@ -37,24 +44,28 @@ export default function RegistrationPage() {
   // }, [token]);
 
   useEffect(() => {
-    const checkToken = async () => {
+    const validateToken = async () => {
       try {
-        // now, “validate” → “check”
+        const response = await axiosApi.get<{ valid: boolean }>(
+          `/api/tokens/validate/${token}`
+        );
+        const data = response.data;
+
         const res = await axiosApi.get<{ valid: boolean; email: string }>(
           `/api/tokens/check/${token}`
         );
         // pre-fill the email:
         setFormData(f => ({ ...f, email: res.data.email }));
-        setValid(true);
-      } catch (e: any) {
-        setError(e.response?.data?.error || "Invalid or expired link.");
-      } finally {
-        setLoading(false);
+        setValid(true); // dev----> what is setValid for?
+        
+        setTokenValid(data.valid);
+      } catch (error) {
+        setTokenValid(false);
       }
     };
 
-    checkToken();
-  }, [token]);
+    validateToken();
+  }, [token, navigate, setTokenValid]);
 
   type FormData = {
     email: string;
@@ -105,17 +116,30 @@ export default function RegistrationPage() {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
+
+    if (!formData.email || !formData.userName || !formData.password) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
+
     try {
-      // when they actually register, consume/mark-used
-      await axiosApi.post(
-        "api/auth/register",
-        formData,
-        { headers: { "Content-Type": "application/json" } }
-      );
-      navigate("/login");
-    } catch (e: any) {
-      // show validation error if e.g. token expired mid-form
-      toast.error(e.response?.data?.error || "Registration failed.");
+      const response = await axiosApi.post("/api/auth/register", formData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = response.data;
+
+      if (data.success) {
+        // set localStorage role
+        localStorage.setItem("role", "Employee");
+        navigate("/login");
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -155,55 +179,63 @@ export default function RegistrationPage() {
         </div>
 
         {/* Right */}
-        <div className="col-md-6 d-flex align-items-center">
-          <form
-            className="form-control p-3"
-            style={{
-              background: "transparent",
-            }}
-          >
-            <label htmlFor="email" className="form-label"></label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="Email"
-              className="form-control"
-              value={formData.email}
-              onChange={handleChange}
-              autoComplete="off"
-            />
-            <label htmlFor="userName" className="form-label"></label>
-            <input
-              type="text"
-              id="userName"
-              name="userName"
-              placeholder="Username"
-              value={formData.userName}
-              className="form-control"
-              onChange={handleChange}
-              autoComplete="off"
-            />
-            <label htmlFor="password" className="form-label"></label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              placeholder="Password"
-              className="form-control"
-              value={formData.password}
-              onChange={handleChange}
-              autoComplete="off"
-            />
-            <button
-              type="submit"
-              className="btn btn-primary mt-3 w-100"
-              onClick={handleSubmit}
+        {tokenValid === false && (
+          <div className="col-md-6 d-flex flex-column align-items-center justify-content-center">
+            <h2 className="fw-bold">Invalid Token</h2>
+            <p className="lead">Please try again.</p>
+          </div>
+        )}
+        {tokenValid === true && (
+          <div className="col-md-6 d-flex align-items-center">
+            <form
+              className="form-control p-3"
+              style={{
+                background: "transparent",
+              }}
             >
-              Register
-            </button>
-          </form>
-        </div>
+              <label htmlFor="email" className="form-label"></label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Email"
+                className="form-control"
+                value={formData.email}
+                onChange={handleChange}
+                autoComplete="off"
+              />
+              <label htmlFor="userName" className="form-label"></label>
+              <input
+                type="text"
+                id="userName"
+                name="userName"
+                placeholder="Username"
+                value={formData.userName}
+                className="form-control"
+                onChange={handleChange}
+                autoComplete="off"
+              />
+              <label htmlFor="password" className="form-label"></label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Password"
+                className="form-control"
+                value={formData.password}
+                onChange={handleChange}
+                autoComplete="off"
+              />
+              <button
+                type="submit"
+                className="btn btn-primary mt-3 w-100"
+                onClick={handleSubmit}
+              >
+                Register
+              </button>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   );

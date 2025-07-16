@@ -1,12 +1,29 @@
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
+import { AppDispatch, RootState } from "../../store/store";
+import { useEffect } from "react";
+import { fetchOnboarding } from "../../store/slices/onboardingSlice";
 
 export default function EmployeeNavigation() {
+  const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
+  const onboarding = useSelector((state: RootState) => state.onboarding.onboarding);
+
+  const onboardingStatus = (onboarding as any)?.status;
+  
 
   const isActive = (path: string) =>
     location.pathname === path ? "active" : "";
 
   const isLoggedIn = () => localStorage.getItem("token");
+
+  const submitted = useSelector(
+    (state: RootState) => state.onboarding.submitted
+  );
+
+  useEffect(() => {
+    dispatch(fetchOnboarding());
+  }, [dispatch]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -39,24 +56,29 @@ export default function EmployeeNavigation() {
         {/* Collapsible Menu */}
         <div className="collapse navbar-collapse" id="employeeNavbar">
           <div className="navbar-nav ms-auto">
-            <Link
-              className={`nav-link ${isActive("/app/profile")}`}
-              to="/app/profile"
-            >
-              Personal Information
-            </Link>
-            <Link
-              className={`nav-link ${isActive("/app/visa")}`}
-              to="/app/visa"
-            >
-              Visa Status Management
-            </Link>
-            <Link
-              className={`nav-link ${isActive("/app/housing")}`}
-              to="/app/housing"
-            >
-              Housing
-            </Link>
+            {submitted && onboardingStatus.toLowerCase() === "approved" && (
+              <>
+                <Link
+                  className={`nav-link ${isActive("/app/profile")}`}
+                  to="/app/profile"
+                >
+                  Personal Information
+                </Link>
+                <Link
+                  className={`nav-link ${isActive("/app/visa")}`}
+                  to="/app/visa"
+                >
+                  Visa Status Management
+                </Link>
+                <Link
+                  className={`nav-link ${isActive("/app/housing")}`}
+                  to="/app/housing"
+                >
+                  Housing
+                </Link>
+              </>
+            )}
+
             <button
               className=" btn btn-outline-primary me-2"
               onClick={handleLogout}

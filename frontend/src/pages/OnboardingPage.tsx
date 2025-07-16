@@ -94,11 +94,11 @@ export default function OnboardingPage() {
   const applicationStatus = (onboarding.onboarding as any)?.status;
   const [documentURLs, setDocumentURLs] = useState<{ [key: string]: string }>(
     {}
-  );
+  );    
 
   const submitted = useSelector(
     (state: RootState) => state.onboarding.submitted
-  );
+  );  
 
   useEffect(() => {
     dispatch(fetchOnboarding());
@@ -110,8 +110,9 @@ export default function OnboardingPage() {
     const applicatonStatus = (
       onboarding.onboarding as any
     )?.status?.toLowerCase();
+    
     if (submitted && applicatonStatus?.toLowerCase() === "approved") {
-      navigate(`/app/dashboard`);
+      navigate(`/app/profile`);
     }
     if (submitted && applicatonStatus?.toLowerCase() === "rejected") {
       const hasSeenRejection = sessionStorage.getItem("hasSeenRejection");
@@ -193,7 +194,7 @@ export default function OnboardingPage() {
   });
 
   useEffect(() => {
-    if ((onboarding.onboarding as any)?.data && !submitted) return;
+    if (!(onboarding.onboarding as any)?.data) return;
 
     // maping documents
     const docs = (onboarding.onboarding as any).documents || [];

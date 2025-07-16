@@ -5,7 +5,7 @@ import Application from "../models/application_model.js";
 // expect a single file, folder = "documents", userId in req.user
 export const uploadDocuments = async (req, res) => {
   try {
-    const userId = req.user?.userId;
+    const userId = req.user?.id;
 
     // might try not accepting anonymous users later
 
