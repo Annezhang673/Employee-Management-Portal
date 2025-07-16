@@ -96,10 +96,9 @@ export default function OnboardingPage() {
     {}
   );  
 
-  
   const submitted = useSelector(
     (state: RootState) => state.onboarding.submitted
-  );
+  );  
 
   useEffect(() => {
     dispatch(fetchOnboarding());
@@ -195,7 +194,7 @@ export default function OnboardingPage() {
   });
 
   useEffect(() => {
-    if ((onboarding.onboarding as any)?.data && !submitted) return;
+    if (!(onboarding.onboarding as any)?.data) return;
 
     // maping documents
     const docs = (onboarding.onboarding as any).documents || [];

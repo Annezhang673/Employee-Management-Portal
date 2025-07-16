@@ -129,8 +129,8 @@ export const submitOnboardingApplication = async (req, res) => {
 // get current latest onboarding application for user
 export const viewOnboardingApplication = async (req, res) => {
   try {
-    const userId = req.user?._id;
-
+    const userId = req.user?._id || req.params.userId;
+    
     const application = await Application.find({ user: userId });
 
     // if mutiple application submit by same user, getting the lastest one
