@@ -99,6 +99,26 @@ export const submitOnboardingApplication = async (req, res) => {
       userUpdate.visaType = parseData.visa.type;
     }
 
+    // added by aic
+    // use with updated user schema
+    const workAuthTitle =
+      parseData.isCitizenOrPR === "yes"
+        ? parseData.citizenstatus
+        : parseData.visa.type === "Other"
+        ? parseData.visa.otherVisaTitle
+        : parseData.visa.type;
+    
+    Object.assign(userUpdate, {
+      firstName:     parseData.firstName,
+      lastName:      parseData.lastName,
+      preferredName: parseData.preferredName,
+      phone:         parseData.cellPhone,
+      ssn:           parseData.ssn,
+      workAuthTitle,
+    });
+
+    // -----------
+
     await User.findByIdAndUpdate(userId, {
       ...userUpdate,
       visaDocs: visaDocs,

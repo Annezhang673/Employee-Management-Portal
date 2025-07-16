@@ -82,7 +82,9 @@ export const updateUserProfile = async (req, res) => {
 export const getUserById = async (req, res) => {
   try {
     const userId = req.params.userId;
-    const user = await User.findById(userId);
+    const user = await User.findById(userId)
+      .select('-password')
+      .lean();
 
     if (!user) {
       res.status(404).json({ error: "User not found" });
@@ -92,5 +94,18 @@ export const getUserById = async (req, res) => {
   } catch (error) {
     console.log("Unable to get user by id", error);
     res.status(500).json({ error: "Unable to get user by id", error });
+  }
+};
+
+export const listEmployees = async (req, res) => {
+  try {
+    const employees = await User.find({ role: 'Employee' })
+      .select('firstName lastName preferredName ssn workAuthTitle phone email')
+      .sort({ lastName: 1 })
+      .lean();
+    res.status(200).json(employees);
+  } catch (err) {
+    console.error('Error listing employees:', err);
+    res.status(500).json({ error: 'Could not list employees.' });
   }
 };
