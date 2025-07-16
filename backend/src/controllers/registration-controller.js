@@ -26,7 +26,7 @@ export const validateToken = async (req, res) => {
   try {
     const token = req.params.token;
 
-    const tokenDoc = await RegistrationToken.findOne({ token });    
+    const tokenDoc = await RegistrationToken.findOne({ token }); 
 
     if (!tokenDoc || tokenDoc.used || tokenDoc.expiresAt < Date.now()) {
       return res.status(400).json({ error: "Invalid or expired token" });

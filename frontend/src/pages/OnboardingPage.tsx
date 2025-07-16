@@ -110,6 +110,9 @@ export default function OnboardingPage() {
     const applicatonStatus = (
       onboarding.onboarding as any
     )?.status?.toLowerCase();
+
+    console.log("applicationStatus:", applicatonStatus);
+    
     if (submitted && applicatonStatus?.toLowerCase() === "approved") {
       navigate(`/app/dashboard`);
     }

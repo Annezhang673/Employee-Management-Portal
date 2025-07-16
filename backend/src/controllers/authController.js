@@ -8,10 +8,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
 const JWT_EXPIRES_IN = "1d"; // Token valid for 1 day
 
 export const registerUser = async (req, res) => {
-
   const { userName, email, password, token } = req.body;
-
-  // getting the token: http://localhost:3000/registration/77e2e9de047f62c6922490b459df95bd
 
   try {
     // Validate token
@@ -32,10 +29,6 @@ export const registerUser = async (req, res) => {
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Randomly assign a house
-    // const houses = await House.find();
-    // const assignedHouse = houses[Math.floor(Math.random() * houses.length)];
 
     const houses = await House.find();
 
@@ -72,7 +65,13 @@ export const registerUser = async (req, res) => {
       expiresIn: JWT_EXPIRES_IN,
     });
 
-    res.status(201).json({ authToken, message: "User registered successfully" });
+    res
+      .status(201)
+      .json({
+        authToken,
+        message: "User registered successfully",
+        success: true,
+      });
   } catch (err) {
     console.error("Registration error:", err);
     res.status(500).json({ message: "Server error" });
