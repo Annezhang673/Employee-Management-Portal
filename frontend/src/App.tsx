@@ -16,10 +16,12 @@ import VisaStatusPage from "./pages/Employee/VisaStatusPage";
 import HousingPage from "./pages/Employee/HousingPage";
 import HousingManagementPage from "./pages/HR/HousingManagementPage";
 import EmployeeManagementPage from "./pages/HR/EmployeeManagementPage";
+import EmployeeDetailPage from "./pages/HR/EmployeeDetailPage";
 import HiringManagementPage from "./pages/HR/HiringManagementPage";
 import VisaStatusManagementPage from "./pages/HR/VisaStatusManagementPage";
 import ErrorPage from "./pages/ErrorPage";
 import ApplicationDetailPage from "./components/onBoardingApplication/ApplicationDetailPage";
+
 
 function App() {
   const router = createBrowserRouter([
@@ -53,7 +55,13 @@ function App() {
         { path: "housing", element: <HousingPage /> },
 
         // HR routes
-        { path: "employeemanagement", element: <EmployeeManagementPage /> },
+        { 
+          path: "employeemanagement", 
+          element: <EmployeeManagementPage />
+        },
+
+        { path: "employeemanagement/:userId", element: <EmployeeDetailPage /> },
+
         { path: "visamanagement", element: <VisaStatusManagementPage /> },
         { path: "hiringmanagement", element: <HiringManagementPage /> },
         { path: "housingmanagement", element: <HousingManagementPage /> },

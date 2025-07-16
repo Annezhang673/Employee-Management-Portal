@@ -90,7 +90,16 @@ export const getUserById = async (req, res) => {
       res.status(404).json({ error: "User not found" });
     }
 
-    res.status(200).json(user);
+    const application = await Application.findOne({ user: user._id })
+      .lean()
+      .select("data documents status feedback");
+
+    const payload = {
+      ...user,
+      application: application || null
+    };
+
+    res.status(200).json(payload);
   } catch (error) {
     console.log("Unable to get user by id", error);
     res.status(500).json({ error: "Unable to get user by id", error });
