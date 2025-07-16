@@ -2,13 +2,14 @@ import { Router } from "express";
 import { getUserById, getUserProfile, updateUserProfile } from "../controllers/user-controller.js";
 import multer from "multer";
 import { verifyToken } from "../middlewares/authMiddleware.js";
+import { listEmployees } from "../controllers/user-controller.js";
 
 const upload = multer({ storage: multer.memoryStorage() });
 
 
 const router = Router();
 
-router.get('/', listEmployees);
+router.get('/', listEmployees); 
 
 // Get api/users/me
 router.get("/me", verifyToken, getUserProfile);
