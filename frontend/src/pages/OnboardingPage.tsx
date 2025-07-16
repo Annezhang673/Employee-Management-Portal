@@ -94,7 +94,7 @@ export default function OnboardingPage() {
   const applicationStatus = (onboarding.onboarding as any)?.status;
   const [documentURLs, setDocumentURLs] = useState<{ [key: string]: string }>(
     {}
-  );  
+  );    
 
   const submitted = useSelector(
     (state: RootState) => state.onboarding.submitted

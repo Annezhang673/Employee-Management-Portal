@@ -7,6 +7,10 @@ import { fetchOnboarding } from "../../store/slices/onboardingSlice";
 export default function EmployeeNavigation() {
   const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
+  const onboarding = useSelector((state: RootState) => state.onboarding.onboarding);
+
+  const onboardingStatus = (onboarding as any)?.status;
+  
 
   const isActive = (path: string) =>
     location.pathname === path ? "active" : "";
@@ -52,7 +56,7 @@ export default function EmployeeNavigation() {
         {/* Collapsible Menu */}
         <div className="collapse navbar-collapse" id="employeeNavbar">
           <div className="navbar-nav ms-auto">
-            {submitted && (
+            {submitted && onboardingStatus === "approved" && (
               <>
                 <Link
                   className={`nav-link ${isActive("/app/profile")}`}
