@@ -25,47 +25,46 @@ export default function RegistrationPage() {
 
   // pull token from url
   const token = window.location.href.split("/").pop();
+
   // useEffect(() => {
   //   const validateToken = async () => {
-  //     // const response = await fetch(
-  //     //   `http://localhost:8080/api/tokens/validate/${token}`
-  //     // );
-  //     // const data = await response.json();
-  //     const response = await axiosApi.get<{ valid: boolean}>(`/api/tokens/validate/${token}`);
-  //     const data = response.data;
+  //     try {
+  //       const response = await axiosApi.get<{ valid: boolean }>(
+  //         `/api/tokens/validate/${token}`
+  //       );
+  //       const data = response.data;
 
-  //     if (!data || !data.valid) {
-  //       // window.location.href = "http://localhost:3000/";
-  //       window.location.href = process.env.REACT_APP_API_URL || "/";
+  //       const res = await axiosApi.get<{ valid: boolean; email: string }>(
+  //         `/api/tokens/check/${token}`
+  //       );
+  //       // pre-fill the email:
+  //       setFormData(f => ({ ...f, email: res.data.email }));
+  //       setValid(true); // dev----> what is setValid for?
+        
+  //       setTokenValid(data.valid);
+  //     } catch (error) {
+  //       setTokenValid(false);
   //     }
   //   };
 
   //   validateToken();
-  // }, [token]);
+  // }, [token, navigate, setTokenValid]);
 
   useEffect(() => {
-    const validateToken = async () => {
+    const check = async () => {
       try {
-        const response = await axiosApi.get<{ valid: boolean }>(
-          `/api/tokens/validate/${token}`
-        );
-        const data = response.data;
-
-        const res = await axiosApi.get<{ valid: boolean; email: string }>(
-          `/api/tokens/check/${token}`
-        );
-        // pre-fill the email:
-        setFormData(f => ({ ...f, email: res.data.email }));
-        setValid(true); // dev----> what is setValid for?
-        
-        setTokenValid(data.valid);
-      } catch (error) {
-        setTokenValid(false);
+        const { data } = await axiosApi.get<{ valid: boolean; email: string }>(`/api/tokens/check/${token}`);
+        if (!data.valid) throw new Error("Invalid token");
+        setFormData(f => ({ ...f, email: data.email }));
+        setTokenValid(true);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
-
-    validateToken();
-  }, [token, navigate, setTokenValid]);
+    check();
+  }, [token]);
 
   type FormData = {
     email: string;
