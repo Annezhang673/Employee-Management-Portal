@@ -112,7 +112,7 @@ export default function OnboardingPage() {
     )?.status?.toLowerCase();
     
     if (submitted && applicatonStatus?.toLowerCase() === "approved") {
-      navigate(`/app/dashboard`);
+      navigate(`/app/profile`);
     }
     if (submitted && applicatonStatus?.toLowerCase() === "rejected") {
       const hasSeenRejection = sessionStorage.getItem("hasSeenRejection");
