@@ -13,6 +13,8 @@ import {
   Divider,
   Pagination,
 } from "@mui/material";
+import axiosApi from "../../lib/axiosApi";
+import toast from "react-hot-toast";
 
 interface Landlord {
   name: string;
@@ -51,7 +53,7 @@ interface HouseDetailsModalProps {
 }
 
 interface Comment {
-  description: string;
+  description?: string;
   createdByName?: string;
   createdAt: string;
 }
@@ -60,6 +62,7 @@ interface FacilityReport {
   _id: string;
   title: string;
   description: string;
+  comments: Comment[];
   createdAt: string;
   status: string;
 }
@@ -74,17 +77,10 @@ const HouseDetailsModal: React.FC<HouseDetailsModalProps> = ({
   const [facilityReports, setFacilityReports] = useState<FacilityReport[]>([]);
   const [selectedPage, setSelectedPage] = useState(1);
   const [residentInfo, setResidentInfo] = useState<Resident[]>([]);
-  const [comments, setComments] = useState<Record<string, Comment[]>>({});
   const [newComment, setNewComment] = useState<Record<string, string>>({});
-  const token = localStorage.getItem("token");
 
   const fetchReports = useCallback(async () => {
-    const res = await axios.get(`/api/report/house/${house._id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    console.log(res.data);
-    
+    const res = await axiosApi.get(`/api/report/house/${house._id}`);
 
     setFacilityReports(
       res.data.sort(
@@ -92,60 +88,61 @@ const HouseDetailsModal: React.FC<HouseDetailsModalProps> = ({
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       )
     );
-  }, [house._id, token]);
+  }, [house._id]);
 
-  const fetchComments = async (reportId: string) => {
-    const res = await axios.get(`/api/report/${reportId}/getComments`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setComments((prev) => ({ ...prev, [reportId]: res.data }));
-  };
+  const fetchComments = useCallback(async (reportId: string) => {
+    const res = await axiosApi.get(`/api/report/${reportId}/getComments`);
+    // setComments((prev) => ({ ...prev, [reportId]: res.data }));
+    setFacilityReports((prev) =>
+      prev.map((report) => {
+        if (report._id === reportId) {
+          return {
+            ...report,
+            comments: res.data,
+          };
+        }
+        return report;
+      })
+    );
+  }, []);
 
   const handleAddComment = async (reportId: string) => {
     const content = newComment[reportId];
     if (!content) return;
-    await axios.post(
-      `/api/report/${reportId}/addComments`,
-      { description: content },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    setNewComment((prev) => ({ ...prev, [reportId]: "" }));
+    await axiosApi.post(`/api/report/${reportId}/addComments`, {
+      description: content,
+    });
+
     await fetchComments(reportId);
+
+    setNewComment((prev) => ({ ...prev, [reportId]: "" }));
   };
 
   const handleStatusChange = async (reportId: string, status: string) => {
-    await axios.patch(
-      `/api/report/${reportId}/status`,
-      { status },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    await fetchReports();
+    await axiosApi.patch(`/api/report/${reportId}/status`, { status });
+    // await fetchReports();
   };
 
   const fetchResidents = useCallback(async () => {
     try {
-      const res = await axios.get(`/api/housing/getResidents/${house._id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(`/api/housing/getResidents/${house._id}`);
       setResidentInfo(res.data.residents || []);
     } catch (error) {
       console.error("Failed to fetch residents", error);
     }
-  }, [house._id, token]);
+  }, [house._id]);
 
   useEffect(() => {
     fetchReports();
     fetchResidents();
-  }, [house, token, refresh, fetchResidents, fetchReports]);
+  }, [refresh, fetchResidents, fetchReports]);
 
   const paginatedReports = facilityReports.slice(
     (selectedPage - 1) * ITEMS_PER_PAGE,
     selectedPage * ITEMS_PER_PAGE
-  );  
+  );
+
+  console.log(facilityReports);
 
   return (
     <Dialog open onClose={onClose} maxWidth="md" fullWidth>
@@ -212,12 +209,21 @@ const HouseDetailsModal: React.FC<HouseDetailsModalProps> = ({
               View Comments
             </Button>
 
-            {comments[report._id]?.map((c, idx) => (
+            {/* {comments[report._id]?.map((c, idx) => (
               <Typography key={idx} variant="body2" ml={2}>
                 - {c.description} by {c.createdByName || "User"} (
                 {new Date(c.createdAt).toLocaleString()})
               </Typography>
-            ))}
+            ))} */}
+
+            {facilityReports
+              .find((r) => r._id === report._id)
+              ?.comments?.map((c, idx) => (
+                <Typography key={idx} variant="body2" ml={2}>
+                  - {c.description} by {c.createdByName || "User"} (
+                  {new Date(c.createdAt).toLocaleString()})
+                </Typography>
+              ))}
 
             <TextField
               label="Add comment"
