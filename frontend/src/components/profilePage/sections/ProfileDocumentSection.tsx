@@ -3,8 +3,9 @@ import EditableSection from "../EditableSection";
 import axiosApi from "../../../lib/axiosApi";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../store/store";
+import { AppDispatch, RootState } from "../../../store/store";
 import { useSelector } from "react-redux";
+import { fetchVisaDocuments } from "../../../store/slices/userInfoSlice";
 
 type Document = {
   _id: string;
@@ -25,10 +26,15 @@ export default function ProfileDocumentSection({
   const [isEditing, setIsEditing] = useState(false);
   const documents = useSelector((state: any) => state.userInfo.documents);
 
-  
-  
+  const visaDoc = useSelector((state: RootState) => state.userInfo.visaDocs);
+
   const [parseDocuments, setParseDocuments] = useState<Document[]>([]);
-  console.log("Documents:", parseDocuments);
+
+  console.log("visaDoc:", visaDoc);
+
+  useEffect(() => {
+    dispatch(fetchVisaDocuments());
+  }, [dispatch]);
 
   useEffect(() => {
     const fetchSignedUrls = async () => {
@@ -40,23 +46,13 @@ export default function ProfileDocumentSection({
     if (!isEditing) fetchSignedUrls();
   }, [isEditing, documents]);
 
-  const handleSave = async () => {
-    try {
-      await axiosApi.put("/api/users/me", documents);
-      toast.success("Document section saved successfully!");
-      setIsEditing(false);
-    } catch (error) {
-      toast.error("Failed to save document section");
-    }
-  };
-
   return (
     <EditableSection
       title="Documents"
-      onSave={handleSave}
       onCancel={() => setIsEditing(false)}
       isEditing={isEditing}
       setIsEditing={setIsEditing}
+      viewOnly
     >
       {/* Show list of ducuments, Employee able to download, open preview */}
       <div className="list-group">
@@ -98,6 +94,46 @@ export default function ProfileDocumentSection({
           <p className="text-muted">No documents available.</p>
         )}
       </div>
+
+      {/* Show Visa Documents if exists */}
+      {visaDoc.length > 0 && (
+        <div className="list-group mt-3">
+          <h5 className="fw-semibold">Visa Documents</h5>
+          <ul className="list-group">
+            {visaDoc.map((doc: any) => (
+              <li
+                key={doc._id}
+                className="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                style={{ cursor: "default" }}
+              >
+                <span className="fw-bold">{doc.type}</span>
+                <div className="btn-group btn-group-sm">
+                  <button
+                    className="btn btn-outline-primary"
+                    onClick={() => window.open(doc.previewUrl, "_blank")}
+                  >
+                    Preview
+                  </button>
+                  <button
+                    className="btn btn-outline-secondary"
+                    onClick={() => {
+                      const link = document.createElement("a");
+                      link.href = doc.downloadUrl;
+                      link.download = doc.name;
+                      document.body.appendChild(link);
+                      link.target = "_blank";
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                  >
+                    Download
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </EditableSection>
   );
 }
