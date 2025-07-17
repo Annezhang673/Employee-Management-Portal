@@ -51,8 +51,14 @@ export const registerUser = async (req, res) => {
 
     await newUser.save();
 
+    // updating house
+    assignedHouse.residents.push(newUser._id);
+    await assignedHouse.save();
+
     // Mark token as used (optional: or delete it)
-    await RegistrationToken.deleteOne({ token });
+    // await RegistrationToken.deleteOne({ token });
+
+    await RegistrationToken.updateOne({ token }, { $set: { used: true } });
 
     // Create JWT
     const payload = {
