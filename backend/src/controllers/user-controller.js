@@ -24,7 +24,10 @@ export const getUserProfile = async (req, res) => {
       signedProfilePicUrl = previewUrl;
     }
 
-    res.status(200).json({ user, application, signedProfilePicUrl });
+    // make singed profile pic url part of user
+    user.profilePicUrl = signedProfilePicUrl;
+
+    res.status(200).json({ user, application });
   } catch (error) {
     console.log("Unable to get user profile", error);
     res.status(500).json({ error: "Unable to get user profile", error });
@@ -56,15 +59,13 @@ export const updateUserProfile = async (req, res) => {
 
     const updatedUser = await User.findOneAndUpdate(
       { _id: userId },
-      { $set: formData },
+      { $set: { ...formData, profilePicUrl: formData.profilePic } },
       { new: true }
     );
 
-    await user.save();
-
     application.data = {
       ...application.data,
-      ...req.body,
+      ...formData,
     };
 
     const updatedApplication = await application.save();
@@ -116,5 +117,3 @@ export const listEmployees = async (req, res) => {
     res.status(500).json({ error: "Could not list employees." });
   }
 };
-
-
