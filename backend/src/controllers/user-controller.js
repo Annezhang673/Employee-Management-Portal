@@ -7,7 +7,7 @@ export const getUserProfile = async (req, res) => {
   try {
     // getting the user id from mongoose User Schema
     const userId = req.user?.id;
-    const user = await User.findById(userId);    
+    const user = await User.findById(userId);
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -24,7 +24,10 @@ export const getUserProfile = async (req, res) => {
       signedProfilePicUrl = previewUrl;
     }
 
-    res.status(200).json({ user, application, signedProfilePicUrl });
+    // make singed profile pic url part of user
+    user.profilePicUrl = signedProfilePicUrl;
+
+    res.status(200).json({ user, application });
   } catch (error) {
     console.log("Unable to get user profile", error);
     res.status(500).json({ error: "Unable to get user profile", error });
@@ -34,7 +37,7 @@ export const getUserProfile = async (req, res) => {
 // Put api/users/me
 export const updateUserProfile = async (req, res) => {
   try {
-    const userId = req.user?.userId; // userId from middleware
+    const userId = req.user?.id; // userId from middleware
     const user = await User.findById(userId);
 
     if (!user) {
@@ -56,15 +59,13 @@ export const updateUserProfile = async (req, res) => {
 
     const updatedUser = await User.findOneAndUpdate(
       { _id: userId },
-      { $set: formData },
+      { $set: { ...formData, profilePicUrl: formData.profilePic } },
       { new: true }
     );
 
-    await user.save();
-
     application.data = {
       ...application.data,
-      ...req.body,
+      ...formData,
     };
 
     const updatedApplication = await application.save();
@@ -82,9 +83,7 @@ export const updateUserProfile = async (req, res) => {
 export const getUserById = async (req, res) => {
   try {
     const userId = req.params.userId;
-    const user = await User.findById(userId)
-      .select('-password')
-      .lean();
+    const user = await User.findById(userId).select("-password").lean();
 
     if (!user) {
       res.status(404).json({ error: "User not found" });
@@ -96,7 +95,7 @@ export const getUserById = async (req, res) => {
 
     const payload = {
       ...user,
-      application: application || null
+      application: application || null,
     };
 
     res.status(200).json(payload);
@@ -108,13 +107,13 @@ export const getUserById = async (req, res) => {
 
 export const listEmployees = async (req, res) => {
   try {
-    const employees = await User.find({ role: 'Employee' })
-      .select('firstName lastName preferredName ssn workAuthTitle phone email')
+    const employees = await User.find({ role: "Employee" })
+      .select("firstName lastName preferredName ssn workAuthTitle phone email")
       .sort({ lastName: 1 })
       .lean();
     res.status(200).json(employees);
   } catch (err) {
-    console.error('Error listing employees:', err);
-    res.status(500).json({ error: 'Could not list employees.' });
+    console.error("Error listing employees:", err);
+    res.status(500).json({ error: "Could not list employees." });
   }
 };

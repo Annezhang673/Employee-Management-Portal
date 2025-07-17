@@ -32,12 +32,10 @@ export const updateUserInfo = createAsyncThunk(
   async (data: Partial<UserInfo>) => {
     // data might contains file
     const formData = new FormData();
+    const { profilePic, ...restData } = data;    
 
-    const { profilePic, ...rest } = data;
-
-    formData.append("data", JSON.stringify(rest));
-
-    if (profilePic) formData.append("profilePic", profilePic);
+    formData.append("profilePic", (profilePic as File) || null || "");
+    formData.append("data", JSON.stringify(restData));
 
     const response = await axiosApi.put<UserInfo>(`/api/users/me`, formData, {
       headers: {
@@ -48,9 +46,45 @@ export const updateUserInfo = createAsyncThunk(
   }
 );
 
+export const uploadVisaDocument = createAsyncThunk(
+  "userInfo/uploadVisaDocument",
+  async (formData: FormData, thunkAPI) => {
+    try {
+      const response = await axiosApi.post("/api/documents/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      return response.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response.message);
+    }
+  }
+);
+
+export const fetchVisaDocuments = createAsyncThunk(
+  "userInfo/fetchVisaDocuments",
+  async () => {
+    const response = await axiosApi.get("/api/documents/user");
+    return response.data.visaDocs || [];
+  }
+);
+
+interface VisaDoc {
+  type: string;
+  s3Key: string;
+  previewUrl: string;
+  downloadUrl: string;
+  status: string;
+  feedback: string;
+  uploadedAt: string;
+}
+
 type UserInfoState = {
   userInfo: UserInfo | null;
   documents: any[];
+  visaDocs: VisaDoc[];
   isLoading: boolean;
   error: string | null;
 };
@@ -58,6 +92,7 @@ type UserInfoState = {
 const initialState: UserInfoState = {
   userInfo: null,
   documents: [],
+  visaDocs: [],
   isLoading: false,
   error: null,
 };
@@ -102,6 +137,30 @@ const userInfoSlice = createSlice({
       })
       .addCase(updateUserInfo.fulfilled, (state, action) => {
         state.userInfo = action.payload;
+      });
+
+    builder
+      .addCase(uploadVisaDocument.fulfilled, (state, action) => {
+        const idx = state.visaDocs.findIndex(
+          (doc) => doc.type === action.payload.type
+        );
+        if (idx >= 0) {
+          state.visaDocs[idx] = action.payload;
+        } else {
+          state.visaDocs.push(action.payload);
+        }
+      })
+
+      .addCase(fetchVisaDocuments.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchVisaDocuments.fulfilled, (state, action) => {
+        state.visaDocs = action.payload;
+        state.isLoading = false;
+      })
+      .addCase(fetchVisaDocuments.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || "Failed to fetch user info";
       });
   },
 });
