@@ -1,7 +1,128 @@
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { AppDispatch, RootState } from "../../store/store";
+import {
+  fetchVisaDocuments,
+  uploadVisaDocument,
+} from "../../store/slices/userInfoSlice";
+import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
+
+// OPT Receipt -> OPT Ead -> I-983 -> New I-20
 export default function VisaStatusPage() {
+  const dispatch = useDispatch<AppDispatch>();
+  const { visaDocs } = useSelector((state: RootState) => state.userInfo);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileType = ["OPT Receipt", "EAD", "I-983", "New I-20"];
+
+  const [step, setStep] = useState(1);
+  const progressPercentage = (step / 4) * 100;
+
+  useEffect(() => {
+    dispatch(fetchVisaDocuments());
+  }, [dispatch]);
+
+  useEffect(() => {
+    setStep(visaDocs.length);
+  }, [visaDocs]);
+
+  const handleUpload = (file: File, docName: string) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("name", docName);
+    try {
+      dispatch(uploadVisaDocument(formData));
+      toast.success("File uploaded successfully!");
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      toast.error("Failed to upload file");
+    }
+  };
+
+  const handleSubmit = () => {
+    if (selectedFile) {
+      handleUpload(selectedFile, fileType[step - 1]);
+      setSelectedFile(null);
+    } else {
+      toast.error("Please select a file");
+      return;
+    }
+  };
+
+  console.log("visaDocs", visaDocs);
+
   return (
-    <>
-      <h1>Visa Status Page</h1>
-    </>
+    <div className="container mt-3">
+      {/* Progress steps */}
+      <h4>Upload Employee Documents</h4>
+      <div className="progress my-3" style={{ height: "10px" }}>
+        <div
+          className="progress-bar"
+          role="progressbar"
+          style={{ width: `${progressPercentage}%` }}
+          aria-valuenow={progressPercentage}
+          aria-valuemin={0}
+          aria-valuemax={100}
+        ></div>
+      </div>
+
+      {step > 0 && visaDocs[step - 1]?.status === "Pending" && (
+        <div className="alert alert-info text-center fw-semibold">
+          <p>Waiting for HR approval</p>
+        </div>
+      )}
+
+      <div className="mb-3">
+        <p className={step >= 1 ? "text-secondary" : "text-muted"}>
+          Upload {fileType[step - 1]}
+        </p>
+
+        <div className="input-group">
+          <input
+            type="file"
+            className="form-control"
+            onChange={(e) => setSelectedFile(e.target.files![0])}
+          />
+
+          <button className="btn btn-primary" onClick={handleSubmit}>
+            Upload
+          </button>
+        </div>
+        {/* Preview file */}
+        {selectedFile && (
+          <>
+            <img
+              src={URL.createObjectURL(selectedFile)}
+              alt={selectedFile.name}
+              className="img-thumbnail"
+            />
+            <div className="mt-3">
+              <p>File Name: {selectedFile.name}</p>
+              <p>File Type: {selectedFile.type}</p>
+              <p>File Size: {selectedFile.size} bytes</p>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Showing all uploaded files */}
+      {visaDocs.length > 0 && (
+        <div className="mt-3">
+          <h4 className="fw-semibold">Uploaded Documents</h4>
+          <ul className="list-group">
+            {visaDocs.map((doc, index) => (
+              <li className="list-group-item" key={index}>
+                <strong>Document {index + 1}:</strong> {doc.type}
+                <img
+                  src={doc.previewUrl}
+                  alt={doc.type}
+                  className="img-thumbnail"
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
   );
 }
