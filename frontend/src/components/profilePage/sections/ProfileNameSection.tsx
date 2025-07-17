@@ -16,7 +16,7 @@ interface NameSectionProps {
 
 export default function ProfileNameSection({ userInfo }: NameSectionProps) {
   const dispatch = useDispatch<AppDispatch>();
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);  
 
   const [form, setForm] = useState<Partial<UserInfo>>({
     profilePic: userInfo?.profilePic,

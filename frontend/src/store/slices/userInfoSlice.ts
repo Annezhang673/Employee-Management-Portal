@@ -32,7 +32,7 @@ export const updateUserInfo = createAsyncThunk(
   async (data: Partial<UserInfo>) => {
     // data might contains file
     const formData = new FormData();
-    const { profilePic, ...restData } = data;
+    const { profilePic, ...restData } = data;    
 
     formData.append("profilePic", (profilePic as File) || null || "");
     formData.append("data", JSON.stringify(restData));
