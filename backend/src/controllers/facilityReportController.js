@@ -94,7 +94,8 @@ export const updateFacilityReportStatus = async (req, res) => {
 };
 
 export const getReportsByHouse = async (req, res) => {
-  const { houseId } = req.params.houseId;
+  const { houseId } = req.params;
+  
   try {
     const reports = await FacilityReport.find({ house: houseId })
       .populate('author', 'fullName email')
