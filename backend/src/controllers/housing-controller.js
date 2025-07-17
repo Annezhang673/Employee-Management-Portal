@@ -65,6 +65,9 @@ export const assignUserToHouse = async (req, res) => {
     house.residents.push(userId);
     house.facilities.Beds -= 1;
     house.facilities.Mattresses -= 1;
+    if (house.facilities.Beds <= 0) {
+      house.available = false;
+    }
     await house.save();
 
     res.status(200).json({ message: 'User assigned successfully', house });
@@ -83,6 +86,7 @@ export const unassignUserFromHouse = async (req, res) => {
     house.residents = house.residents.filter(id => id.toString() !== userId);
     house.facilities.Beds += 1;
     house.facilities.Mattresses += 1;
+    house.available = true;
     await house.save();
 
     res.status(200).json({ message: 'User unassigned', house });
