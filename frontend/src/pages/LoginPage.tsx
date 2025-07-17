@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axiosApi from "../lib/axiosApi";
 import { useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../store/store";
-import { useDispatch } from "react-redux";
-import { fetchOnboarding } from "../store/slices/onboardingSlice";
+import { RootState } from "../store/store";
 
 export default function LoginPage() {
   const [selectedRole, setSelectedRole] = useState<"HR" | "Employee" | null>(
     null
   );
 
-  const dispatch = useDispatch<AppDispatch>();
   const submitted = useSelector(
     (state: RootState) => state.onboarding.submitted
   );
@@ -69,63 +66,70 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="container p-4 text-primary">
-      <h2>Login Page</h2>
-
-      <button
-        className="btn btn-primary me-2"
-        onClick={() => setSelectedRole("HR")}
-      >
-        Login as HR
-      </button>
-      <button
-        className="btn btn-success me-2"
-        onClick={() => setSelectedRole("Employee")}
-      >
-        Login as Employee
-      </button>
-
-      {/* <button className="btn btn-info me-2">
-        <Link
-          to={"/app/onboarding"}
-          className="text-white text-decoration-none"
+    <div className="container-fluid mt-5 d-flex flex-column justify-content-center align-items-center text-primary">
+      <div>
+        <button
+          className={`btn btn-outline-primary me-2 ${
+            selectedRole === "HR" && "active"
+          }`}
+          onClick={() => setSelectedRole("HR")}
         >
-          Temp entry for Onboarding
-        </Link>
-      </button> */}
+          Login as HR
+        </button>
+        <button
+          className={`btn btn-outline-primary ${
+            selectedRole === "Employee" && "active"
+          }`}
+          onClick={() => setSelectedRole("Employee")}
+        >
+          Login as Employee
+        </button>
+      </div>
 
       {selectedRole && (
-        <form onSubmit={handleSubmit} className="mt-4">
-          <h4>{`Logging in as ${selectedRole.toUpperCase()}`}</h4>
+        <div
+          className="mt-4 p-4 shadow-sm rounded text-primary"
+          style={{
+            backgroundColor: "rgba(255, 255, 255, 0.1)",
+            backdropFilter: "blur(10px)",
+            WebkitBackdropFilter: "blur(10px)",
+            minWidth: "400px",
+            maxWidth: "600px",
+            width: "100%",
+          }}
+        >
+          <form onSubmit={handleSubmit} className="mt-2">
+            <h4 className="text-center">Login as <strong>{selectedRole}</strong></h4>
 
-          <div className="mb-3">
-            <label className="form-label">Username:</label>
-            <input
-              type="text"
-              className="form-control"
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-              required
-            />
-          </div>
+            <div className="mb-3">
+              <label className="form-label">Username:</label>
+              <input
+                type="text"
+                className="form-control"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                required
+              />
+            </div>
 
-          <div className="mb-3">
-            <label className="form-label">Password:</label>
-            <input
-              type="password"
-              className="form-control"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+            <div className="mb-3">
+              <label className="form-label">Password:</label>
+              <input
+                type="password"
+                className="form-control"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
 
-          {error && <div className="alert alert-danger">{error}</div>}
+            {error && <div className="alert alert-danger">{error}</div>}
 
-          <button type="submit" className="btn btn-primary">
-            Submit
-          </button>
-        </form>
+            <button type="submit" className="btn btn-primary w-100">
+              Submit
+            </button>
+          </form>
+        </div>
       )}
     </div>
   );

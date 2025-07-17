@@ -100,10 +100,19 @@ export default function VisaStatusPage() {
     return status === "rejected" ? `Rejected: ${feedback}` : "";
   };
 
+  const handlePreview = (url: string) => {
+    window.open(url, "_blank");
+  };
+
   return (
-    <div className="container mt-3">
+    <div
+      className="container mt-3 p-3 h-100 overflow-auto"
+      style={{
+        maxHeight: "calc(100vh - 80px)",
+      }}
+    >
       {/* Progress steps */}
-      <h4>Upload Employee Documents</h4>
+      <h4 className="fw-semibold">Upload Employee Documents</h4>
       <div className="progress my-3" style={{ height: "10px" }}>
         <div
           className="progress-bar"
@@ -129,7 +138,7 @@ export default function VisaStatusPage() {
 
       {step > fileType.length && (
         <div className="alert alert-success text-center fw-semibold">
-          <p>All documents have been approved.</p>
+          <p className="fw-semibold">All documents have been approved.</p>
         </div>
       )}
 
@@ -215,7 +224,9 @@ export default function VisaStatusPage() {
                 <img
                   src={doc.previewUrl}
                   alt={doc.type}
-                  className="img-thumbnail"
+                  className="img-thumbnail cursor-pointer"
+                  style={{ width: "150px" }}
+                  onClick={() => handlePreview(doc.previewUrl)}
                 />
               </li>
             ))}

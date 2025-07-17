@@ -140,7 +140,7 @@ export default function ProfileNameSection({ userInfo }: NameSectionProps) {
                 }
               />
             </div>
-            <div className="col-md-2">
+            <div className="col-md-2 col-sm-2">
               <img
                 src={
                   form.profilePic instanceof File
