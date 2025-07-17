@@ -1,6 +1,31 @@
 import User from "../models/user_model.js";
 import { getSignedFileURL } from "../lib/s3.js";
 
+
+const REQUIRED_STEPS = [
+   {
+      type:        "OPT Receipt",               
+      submitText:  "Submit OPT Receipt",
+      waitingText: "Waiting for HR to approve your OPT Receipt",
+   },
+   {
+      type:        "EAD",                     
+      submitText:  "Please upload OPT EAD",
+      waitingText: "Waiting for HR to approve your OPT EAD",
+   },
+   {
+      type:        "I-983",                     
+      submitText:  "Please upload your filled I-983",
+      waitingText: "Waiting for HR to approve and sign your I-983",
+   },
+   {
+      type:        "New I-20",                  
+      submitText:  "Please upload your new I-20",
+      waitingText: "Waiting for HR to approve your I-20",
+   },
+];
+
+
 /**
  * 1. GET /api/visa/in-progress
  *    Returns all users with any visaDoc.status !== 'Approved'
@@ -30,24 +55,63 @@ export const getInProgress = async (req, res) => {
          const endTs = endDate ? new Date(endDate).getTime() : now;
          const daysRemaining = Math.max(0, Math.ceil((endTs - now) / (1000 * 60 * 60 * 24)));
 
-         // 3. Find the first visaDoc with status !== 'Approved', (Not Approved)
-         const pending = docs.find((d) => d.status !== "Approved");
-         let previewUrl = null;
-         if (pending) {
-            const { previewUrl: signedUrl} = await getSignedFileURL(pending.s3Key);
-            previewUrl = signedUrl;
+         let nextStep, pendingDoc;
+         for (let step of REQUIRED_STEPS) {
+            const found = docs.find( (d) => d.type === step.type);
+            if (!found) {
+               nextStep = step.submitText;
+               pendingDoc = null;
+               break;
+            }
+
+            if (found.status === "Pending") {
+               // uploaded but pending
+               nextStep = step.waitingText;
+
+               // signed URL for preview
+               const { previewUrl: signedUrl } = await getSignedFileURL(found.s3Key);
+               pendingDoc = { type: found.type, url: signedUrl };
+               break;
+            }
+
+            if (found.status === "Rejected") {
+               // Uploaded but rejected
+               nextStep = found.feedback ? `Rejected: ${found.feedback}` : `Your ${found.type} was rejected`;
+               pendingDoc = null;
+               break;
+            }
+
+            if (found.status === "Approved") {
+               // Approved, continue to next step
+               continue;
+            }
          }
-         
-         // determine the nextStep message
-         let nextStep;
-         if (docs.length === 0) {
-            nextStep = "Submit OPT Receipt";
-         } else if( pending ) {
-            nextStep = pending.status === 'Pending' ? `Waiting for HR approval of ${pending.type}`
-               : `Please upload ${pending.type}`;
-         } else {
+
+         if( !nextStep ) {
+            // All required steps are approved
             nextStep = "All documents approved";
+            pendingDoc = null;
          }
+
+
+         // // 3. Find the first visaDoc with status !== 'Approved', (Not Approved)
+         // const pending = docs.find((d) => d.status !== "Approved");
+         // let previewUrl = null;
+         // if (pending) {
+         //    const { previewUrl: signedUrl} = await getSignedFileURL(pending.s3Key);
+         //    previewUrl = signedUrl;
+         // }
+         
+         // // determine the nextStep message
+         // let nextStep;
+         // if (docs.length === 0) {
+         //    nextStep = "Submit OPT Receipt";
+         // } else if( pending ) {
+         //    nextStep = pending.status === 'Pending' ? `Waiting for HR approval of ${pending.type}`
+         //       : `Please upload ${pending.type}`;
+         // } else {
+         //    nextStep = "All documents approved";
+         // }
 
          return {
             userId:       u._id.toString(),
@@ -57,17 +121,14 @@ export const getInProgress = async (req, res) => {
             endDate,      // from application.data.visa
             daysRemaining,
             nextStep,
-            pendingDoc: pending
-               ? { type: pending.type, url: previewUrl }
-               : null,
+            pendingDoc,
          };
       })
    )
    
-      const filtered = payload.filter( (p) => p.nextStep !== "All documents approved");
-      // .filter( (item) => item.nextStep !== "All documents approved" );
+      const inProgress = payload.filter((p) => p.nextStep !== "All documents approved");
+      return res.status(200).json(inProgress);
 
-      return res.status(200).json(filtered);
    } catch (err) {
       console.error('*** getInProgress ERROR ***', err.stack || err);
       return res.status(500).json({ error: "Server error" });
