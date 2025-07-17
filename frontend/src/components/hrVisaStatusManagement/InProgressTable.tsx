@@ -39,16 +39,32 @@ export default function InProgressTable({ data, loading, onApprove, onReject, on
                {u.pendingDoc ? (
                   <>
                      <Button
-                     size="sm"
-                     onClick={() => onApprove(u.userId, u.pendingDoc!.type)}
+                        size="sm"
+                        variant="secondary"
+                        className="me-1"
+                        onClick={() => {
+                           console.log("Preview URL:", u.pendingDoc?.url);
+                           if (u.pendingDoc?.url) {
+                              window.open(u.pendingDoc.url, "_blank");
+                           } else {
+                              alert("No URL to preview!");
+                           }
+                        }}
+                     >
+                     Preview
+                     </Button>
+
+                     <Button
+                        size="sm"
+                        onClick={() => onApprove(u.userId, u.pendingDoc!.type)}
                      >
                      Approve
                      </Button>{" "}
                      <Button
-                     size="sm"
-                     variant="danger"
-                     onClick={() =>
-                        onReject(u.userId, u.pendingDoc!.type, window.prompt("Feedback?") || "")
+                        size="sm"
+                        variant="danger"
+                        onClick={() =>
+                           onReject(u.userId, u.pendingDoc!.type, window.prompt("Feedback?") || "")
                      }
                      >
                      Reject
@@ -60,6 +76,8 @@ export default function InProgressTable({ data, loading, onApprove, onReject, on
                   </Button>
                )}
                </td>
+
+
             </tr>
          ))}
          </tbody>

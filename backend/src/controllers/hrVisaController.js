@@ -1,4 +1,5 @@
 import User from "../models/user_model.js";
+import { getSignedFileURL } from "../lib/s3.js";
 
 /**
  * 1. GET /api/visa/in-progress
@@ -14,7 +15,8 @@ export const getInProgress = async (req, res) => {
 
       const now = Date.now();
 
-      const payload = users.map( (u) => {
+      const payload = await Promise.all (
+         users.map( async (u) => {
 
          // 1. Guard against missing visaDocs
          const docs = Array.isArray(u.visaDocs) ? u.visaDocs : [];
@@ -30,6 +32,11 @@ export const getInProgress = async (req, res) => {
 
          // 3. Find the first visaDoc with status !== 'Approved', (Not Approved)
          const pending = docs.find((d) => d.status !== "Approved");
+         let previewUrl = null;
+         if (pending) {
+            const { previewUrl: signedUrl} = await getSignedFileURL(pending.s3Key);
+            previewUrl = signedUrl;
+         }
          
          // determine the nextStep message
          let nextStep;
@@ -51,13 +58,16 @@ export const getInProgress = async (req, res) => {
             daysRemaining,
             nextStep,
             pendingDoc: pending
-               ? { type: pending.type, url: pending.url }
+               ? { type: pending.type, url: previewUrl }
                : null,
          };
       })
-      .filter( (item) => item.nextStep !== "All documents approved" );
+   )
+   
+      const filtered = payload.filter( (p) => p.nextStep !== "All documents approved");
+      // .filter( (item) => item.nextStep !== "All documents approved" );
 
-      return res.status(200).json(payload);
+      return res.status(200).json(filtered);
    } catch (err) {
       console.error('*** getInProgress ERROR ***', err.stack || err);
       return res.status(500).json({ error: "Server error" });
