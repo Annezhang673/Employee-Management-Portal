@@ -1,14 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
 import axiosApi from '../../lib/axiosApi';
-
-interface RawToken {
-   email:     string;
-   token:     string;     
-   used:      boolean;    
-   expiresAt: string;     
-   createdAt: string;     
-}
 
 export interface TokenRecord {
    email:      string;

@@ -11,6 +11,7 @@ import authRoutes from "./src/routes/auth-route.js";
 import userLoginRoutes from "./src/routes/login-route.js";
 import userRoutes from "./src/routes/user-route.js";
 import registrationTokenRoutes from "./src/routes/registrationToken-route.js";
+import visaRouter from "./src/routes/visaRoute.js";
 
 const app = express();
 dotenv.config();
@@ -25,6 +26,7 @@ app.use("/api/documents", uploadDocumentRoutes);
 app.use("/api/hiring/review", HrReviewRoute);
 app.use("/api/onboarding", onboardingRoutes);
 app.use("/api/users/", userRoutes);
+app.use("/api/visa", visaRouter);
 app.use("/api", userLoginRoutes);
 
 const PORT = process.env.PORT || 3000;
