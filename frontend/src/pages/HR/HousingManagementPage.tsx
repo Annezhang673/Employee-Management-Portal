@@ -11,9 +11,12 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  Container,
 } from "@mui/material";
 import HouseDetailsModal from "./HouseDetailsModal";
 import axiosApi from "../../lib/axiosApi";
+import { CardImg } from "react-bootstrap";
+import demoHouseImg from "../../assets/images/demohouse.jpg";
 
 interface Landlord {
   name: string;
@@ -82,23 +85,31 @@ const HousingManagementPage: React.FC = () => {
   }, [fetchHouses]);
 
   return (
-    <div style={{ padding: "2rem" }}>
+    <Container maxWidth="lg" sx={{ mt: 4 }} >
       <Typography variant="h4" gutterBottom>
         Housing Management
       </Typography>
       <Button variant="contained" onClick={() => setOpenForm(true)}>
         Add New House
       </Button>
-      <Grid container spacing={2} mt={2}>
+      <Grid container spacing={1} mt={2}>
         {houses.map((house) => (
           <Grid key={house._id as string} size={{ xs: 12, md: 6 }}>
-            <Card>
+            <Card sx={{maxWidth: 345}}>
+              <CardImg src={demoHouseImg} alt="House" style={{ width: "100%" }} />
               <CardContent>
-                <Typography variant="h6">{house.address}</Typography>
-                <Typography>Landlord: {house.landlord?.name}</Typography>
-                <Typography>Contact: {house.landlord?.contact}</Typography>
+                <Typography variant="h6" gutterBottom>
+                  <strong>{house.address}</strong>
+                </Typography>
                 <Typography>
-                  # of Residents: {house.residents?.length || 0}
+                  <strong>Landlord:</strong> {house.landlord?.name}
+                </Typography>
+                <Typography>
+                  <strong>Contact:</strong> {house.landlord?.contact}
+                </Typography>
+                <Typography>
+                  <strong>Current Residents:</strong>{" "}
+                  {house.residents?.length || 0}
                 </Typography>
                 <Button onClick={() => setSelectedHouse(house)}>Details</Button>
                 <Button
@@ -222,7 +233,7 @@ const HousingManagementPage: React.FC = () => {
           refresh={fetchHouses}
         />
       )}
-    </div>
+    </Container>
   );
 };
 

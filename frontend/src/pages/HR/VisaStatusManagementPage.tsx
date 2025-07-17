@@ -71,7 +71,7 @@ export default function VisaStatusManagementPage() {
     };
 
     return (
-        <div className="p-4">
+        <div className="container p-4">
             <h1>Visa Status Management</h1>
 
             {error && <Alert variant="danger">{error}</Alert>}
