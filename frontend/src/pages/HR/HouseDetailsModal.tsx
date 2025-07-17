@@ -12,6 +12,7 @@ import {
   ListItem,
   Divider,
   Pagination,
+  ButtonGroup,
 } from "@mui/material";
 import axiosApi from "../../lib/axiosApi";
 import toast from "react-hot-toast";
@@ -117,6 +118,8 @@ const HouseDetailsModal: React.FC<HouseDetailsModalProps> = ({
     await fetchComments(reportId);
 
     setNewComment((prev) => ({ ...prev, [reportId]: "" }));
+
+    toast.success("Comment added successfully");
   };
 
   const handleStatusChange = async (reportId: string, status: string) => {
@@ -126,7 +129,7 @@ const HouseDetailsModal: React.FC<HouseDetailsModalProps> = ({
 
   const fetchResidents = useCallback(async () => {
     try {
-      const res = await axiosApi.get(`/api/housing/getResidents/${house._id}`);      
+      const res = await axiosApi.get(`/api/housing/getResidents/${house._id}`);
 
       setResidentInfo(res.data.residents || []);
     } catch (error) {
@@ -143,11 +146,6 @@ const HouseDetailsModal: React.FC<HouseDetailsModalProps> = ({
     (selectedPage - 1) * ITEMS_PER_PAGE,
     selectedPage * ITEMS_PER_PAGE
   );
-
-  // console.log(facilityReports);
-  // console.log(facilityReports[facilityReports.length - 1]?.comments);
-  // console.log(residentInfo);
-  
 
   return (
     <Dialog open onClose={onClose} maxWidth="md" fullWidth>
@@ -193,32 +191,48 @@ const HouseDetailsModal: React.FC<HouseDetailsModalProps> = ({
         </Typography>
         {paginatedReports.map((report) => (
           <div key={report._id} style={{ marginBottom: "1rem" }}>
-            <Typography variant="subtitle1">{report.title}</Typography>
+            <Typography variant="subtitle1" fontWeight="bold">
+              {report.title}
+            </Typography>
             <Typography>{report.description}</Typography>
-            <Typography variant="body2">
+            <Typography variant="body2" color="textSecondary">
               Created: {new Date(report.createdAt).toLocaleString()}
             </Typography>
-            <Typography>Status: {report.status}</Typography>
-            <Button onClick={() => handleStatusChange(report._id, "Open")}>
-              Open
-            </Button>
-            <Button
-              onClick={() => handleStatusChange(report._id, "In Progress")}
+            <Typography variant="body2" color="textSecondary">
+              Status: {report.status}
+            </Typography>
+            <ButtonGroup
+              variant="outlined"
+              color="primary"
+              size="small"
+              sx={{ mt: 1 }}
             >
-              In Progress
-            </Button>
-            <Button onClick={() => handleStatusChange(report._id, "Closed")}>
-              Closed
-            </Button>
+              <Button onClick={() => handleStatusChange(report._id, "Open")}>
+                Open
+              </Button>
+              <Button
+                onClick={() => handleStatusChange(report._id, "In Progress")}
+              >
+                In Progress
+              </Button>
+              <Button onClick={() => handleStatusChange(report._id, "Closed")}>
+                Closed
+              </Button>
+            </ButtonGroup>
 
-            {facilityReports
-              .find((r) => r._id === report._id)
-              ?.comments?.map((c, idx) => (
-                <Typography key={idx} variant="body2" ml={2}>
-                  - {c.text} by {c.createdByName || "User"} (
-                  {new Date(c.createdAt).toLocaleString()})
-                </Typography>
-              ))}
+            {/* Comment Section */}
+            <Typography variant="h6" mt={2}>
+              Comments
+            </Typography>
+
+            {report.comments?.map((c, idx) => (
+              <Typography key={idx} variant="body2" ml={2}>
+                {idx + 1}. {c.text || c.description} by{" "}
+                {c.createdByName || "User"} (
+                {new Date(c.createdAt).toLocaleString()})
+              </Typography>
+            ))}
+
             <TextField
               label="Add comment"
               fullWidth
@@ -239,6 +253,7 @@ const HouseDetailsModal: React.FC<HouseDetailsModalProps> = ({
             >
               Submit Comment
             </Button>
+
             <Divider sx={{ mt: 2 }} />
           </div>
         ))}
