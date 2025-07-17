@@ -3,6 +3,7 @@ import onboardingSlice from "./slices/onboardingSlice";
 import tokenReducer from "./slices/tokenSlice";
 import reviewReducer from "./slices/reviewSlice";
 import userInfoSlice from "./slices/userInfoSlice";
+import visaReducer from "./slices/visaSlice";
 
 const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ const store = configureStore({
     userInfo: userInfoSlice.reducer,
     tokens: tokenReducer,
     review: reviewReducer,
+    visa: visaReducer
   },
 });
 
