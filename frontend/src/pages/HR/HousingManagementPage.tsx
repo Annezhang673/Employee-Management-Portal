@@ -84,6 +84,7 @@ const HousingManagementPage: React.FC = () => {
   useEffect(() => {
     fetchHouses();
   }, [fetchHouses]);
+  
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
@@ -103,7 +104,7 @@ const HousingManagementPage: React.FC = () => {
                 style={{ width: "100%" }}
               />
               <CardContent>
-                <Typography variant="h6" gutterBottom >
+                <Typography variant="h6" gutterBottom>
                   <strong>{house.address}</strong>
                 </Typography>
                 <Typography>

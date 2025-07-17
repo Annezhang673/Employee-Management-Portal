@@ -145,7 +145,7 @@ const HouseDetailsModal: React.FC<HouseDetailsModalProps> = ({
   const paginatedReports = facilityReports.slice(
     (selectedPage - 1) * ITEMS_PER_PAGE,
     selectedPage * ITEMS_PER_PAGE
-  );
+  );  
 
   return (
     <Dialog open onClose={onClose} maxWidth="md" fullWidth>

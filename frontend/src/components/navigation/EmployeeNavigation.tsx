@@ -35,6 +35,9 @@ export default function EmployeeNavigation() {
     window.location.href = "/";
   };
 
+  console.log(onboarding);
+  
+
   return (
     <nav className="navbar navbar-expand-lg bg-secondary navbar-dark">
       <div className="container-fluid">
