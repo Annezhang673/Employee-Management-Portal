@@ -16,7 +16,7 @@ interface NameSectionProps {
 
 export default function ProfileNameSection({ userInfo }: NameSectionProps) {
   const dispatch = useDispatch<AppDispatch>();
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);  
 
   const [form, setForm] = useState<Partial<UserInfo>>({
     profilePic: userInfo?.profilePic,
@@ -58,7 +58,7 @@ export default function ProfileNameSection({ userInfo }: NameSectionProps) {
         ssn: form.ssn,
         dob: form.dob,
         gender: form.gender,
-      };
+      };      
 
       await dispatch(updateUserInfo(payload));
       await dispatch(fetchUserInfo());
@@ -74,7 +74,7 @@ export default function ProfileNameSection({ userInfo }: NameSectionProps) {
   const handleCancel = () => {
     setForm(userInfo || {});
     setIsEditing(false);
-  };
+  };  
 
   return (
     <EditableSection

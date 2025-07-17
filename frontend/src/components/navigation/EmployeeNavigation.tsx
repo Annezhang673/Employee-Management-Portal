@@ -7,10 +7,13 @@ import { fetchOnboarding } from "../../store/slices/onboardingSlice";
 export default function EmployeeNavigation() {
   const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
-  const onboarding = useSelector((state: RootState) => state.onboarding.onboarding);
+  const onboarding = useSelector(
+    (state: RootState) => state.onboarding.onboarding
+  );
+
+  const visaType = (onboarding as any)?.data?.visa?.type;
 
   const onboardingStatus = (onboarding as any)?.status;
-  
 
   const isActive = (path: string) =>
     location.pathname === path ? "active" : "";
@@ -64,12 +67,17 @@ export default function EmployeeNavigation() {
                 >
                   Personal Information
                 </Link>
-                <Link
-                  className={`nav-link ${isActive("/app/visa")}`}
-                  to="/app/visa"
-                >
-                  Visa Status Management
-                </Link>
+                {(visaType === "F1" ||
+                  visaType === "OPT" ||
+                  visaType === "H1B" ||
+                  visaType === "Other") && (
+                  <Link
+                    className={`nav-link ${isActive("/app/visa")}`}
+                    to="/app/visa"
+                  >
+                    Visa Status Management
+                  </Link>
+                )}
                 <Link
                   className={`nav-link ${isActive("/app/housing")}`}
                   to="/app/housing"
