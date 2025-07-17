@@ -12,6 +12,7 @@ import {
   DialogActions,
   TextField,
   Container,
+  ButtonGroup,
 } from "@mui/material";
 import HouseDetailsModal from "./HouseDetailsModal";
 import axiosApi from "../../lib/axiosApi";
@@ -85,7 +86,7 @@ const HousingManagementPage: React.FC = () => {
   }, [fetchHouses]);
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }} >
+    <Container maxWidth="lg" sx={{ mt: 4 }}>
       <Typography variant="h4" gutterBottom>
         Housing Management
       </Typography>
@@ -95,10 +96,14 @@ const HousingManagementPage: React.FC = () => {
       <Grid container spacing={1} mt={2}>
         {houses.map((house) => (
           <Grid key={house._id as string} size={{ xs: 12, md: 6 }}>
-            <Card sx={{maxWidth: 345}}>
-              <CardImg src={demoHouseImg} alt="House" style={{ width: "100%" }} />
+            <Card sx={{ maxWidth: 345, textAlign: "center" }}>
+              <CardImg
+                src={demoHouseImg}
+                alt="House"
+                style={{ width: "100%" }}
+              />
               <CardContent>
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h6" gutterBottom >
                   <strong>{house.address}</strong>
                 </Typography>
                 <Typography>
@@ -111,13 +116,17 @@ const HousingManagementPage: React.FC = () => {
                   <strong>Current Residents:</strong>{" "}
                   {house.residents?.length || 0}
                 </Typography>
-                <Button onClick={() => setSelectedHouse(house)}>Details</Button>
-                <Button
-                  onClick={() => handleDeleteHouse(house._id)}
-                  color="error"
-                >
-                  Delete
-                </Button>
+                <ButtonGroup size="small" sx={{ mt: 2 }}>
+                  <Button onClick={() => setSelectedHouse(house)}>
+                    Details
+                  </Button>
+                  <Button
+                    onClick={() => handleDeleteHouse(house._id)}
+                    color="error"
+                  >
+                    Delete
+                  </Button>
+                </ButtonGroup>
               </CardContent>
             </Card>
           </Grid>
