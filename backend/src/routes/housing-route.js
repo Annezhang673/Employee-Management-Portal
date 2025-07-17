@@ -8,7 +8,8 @@ import {
   deleteHouse,
   assignUserToHouse,
   unassignUserFromHouse,
-  randomlyAssignUserToHouse
+  randomlyAssignUserToHouse,
+  getHouseResidents
 } from '../controllers/housing-controller.js';
 
 const router = express.Router();
@@ -20,6 +21,7 @@ router.post('/createHouse', verifyToken, requireHR, createHouse); //working
 router.delete('/:id', verifyToken, requireHR, deleteHouse); //works
 router.post('/:houseId/assign/:userId', verifyToken, requireHR, assignUserToHouse); //works
 router.post('/:houseId/unassign/:userId', verifyToken, requireHR, unassignUserFromHouse); //works
+router.get('/getResidents/:houseId', verifyToken, requireHR, getHouseResidents);
 
 router.post('/initialAssignment', verifyToken, randomlyAssignUserToHouse) //works
 

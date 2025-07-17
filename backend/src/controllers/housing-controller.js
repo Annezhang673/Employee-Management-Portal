@@ -132,3 +132,26 @@ export const randomlyAssignUserToHouse = async (req, res) => {
     res.status(500).json({ message: 'Random assignment failed' });
   }
 };
+
+
+export const getHouseResidents = async (req, res) => {
+  const houseId = req.params.houseId;
+  try {
+    const house = await House.findById(houseId);
+    if(!house) return res.status(404).json({message: "Unable to fetch residents"});
+    // Populate users from resident IDs
+    const users = await Promise.all(
+      house.residents.map(residentId => User.findById(residentId).select('_id firstName lastName preferredName phone email'))
+    );
+
+    if (!users) return res.status(404).json({message: "Unable to fetch all residents"});
+
+    return res.status(200).json({
+      message: "Successfully fetched all users",
+      residents: users
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({message: 'Cannot fetch house residents'})
+  }
+};

@@ -92,3 +92,17 @@ export const updateFacilityReportStatus = async (req, res) => {
     res.status(500).json({ error: 'Failed to update status' });
   }
 };
+
+export const getReportsByHouse = async (req, res) => {
+  const { houseId } = req.params.houseId;
+  try {
+    const reports = await FacilityReport.find({ house: houseId })
+      .populate('author', 'fullName email')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(reports);
+  } catch (err) {
+    console.error('Error fetching reports by house:', err);
+    res.status(500).json({ error: 'Failed to fetch reports for this house' });
+  }
+};
