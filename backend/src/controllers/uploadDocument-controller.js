@@ -33,6 +33,7 @@ export const uploadDocuments = async (req, res) => {
       previewUrl,
       downloadUrl,
       status: "Pending",
+      feedback: req.body.feedback || "",
       uploadedAt: new Date(),
     };
 

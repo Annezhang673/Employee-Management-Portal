@@ -79,6 +79,7 @@ interface VisaDoc {
   previewUrl: string;
   downloadUrl: string;
   status: string;
+  feedback: string;
   uploadedAt: string;
 }
 
