@@ -126,7 +126,8 @@ const HouseDetailsModal: React.FC<HouseDetailsModalProps> = ({
 
   const fetchResidents = useCallback(async () => {
     try {
-      const res = await axios.get(`/api/housing/getResidents/${house._id}`);
+      const res = await axiosApi.get(`/api/housing/getResidents/${house._id}`);      
+
       setResidentInfo(res.data.residents || []);
     } catch (error) {
       console.error("Failed to fetch residents", error);
@@ -144,7 +145,9 @@ const HouseDetailsModal: React.FC<HouseDetailsModalProps> = ({
   );
 
   // console.log(facilityReports);
-  console.log(facilityReports[facilityReports.length - 1]?.comments);
+  // console.log(facilityReports[facilityReports.length - 1]?.comments);
+  // console.log(residentInfo);
+  
 
   return (
     <Dialog open onClose={onClose} maxWidth="md" fullWidth>

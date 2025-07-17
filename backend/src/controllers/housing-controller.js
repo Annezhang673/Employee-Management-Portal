@@ -140,6 +140,9 @@ export const randomlyAssignUserToHouse = async (req, res) => {
 
 export const getHouseResidents = async (req, res) => {
   const houseId = req.params.houseId;
+  console.log(houseId);
+  
+
   try {
     const house = await House.findById(houseId);
     if (!house)
