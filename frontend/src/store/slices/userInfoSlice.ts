@@ -32,12 +32,10 @@ export const updateUserInfo = createAsyncThunk(
   async (data: Partial<UserInfo>) => {
     // data might contains file
     const formData = new FormData();
+    const { profilePic, ...restData } = data;
 
-    const { profilePic, ...rest } = data;
-
-    formData.append("data", JSON.stringify(rest));
-
-    if (profilePic) formData.append("profilePic", profilePic);
+    formData.append("profilePic", (profilePic as File) || null || "");
+    formData.append("data", JSON.stringify(restData));
 
     const response = await axiosApi.put<UserInfo>(`/api/users/me`, formData, {
       headers: {
@@ -56,7 +54,7 @@ export const uploadVisaDocument = createAsyncThunk(
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      });      
+      });
 
       return response.data;
     } catch (error: any) {

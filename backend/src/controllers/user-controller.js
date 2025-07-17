@@ -34,7 +34,7 @@ export const getUserProfile = async (req, res) => {
 // Put api/users/me
 export const updateUserProfile = async (req, res) => {
   try {
-    const userId = req.user?.userId; // userId from middleware
+    const userId = req.user?.id; // userId from middleware
     const user = await User.findById(userId);
 
     if (!user) {
