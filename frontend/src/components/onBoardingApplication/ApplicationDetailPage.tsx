@@ -68,7 +68,7 @@ export default function ApplicationDetailPage() {
          <ul>
          {app.documents.map((doc: any) => (
             <li key={doc.name}>
-               <a href={doc.url} target="_blank" rel="noreferrer">
+               <a href={doc.previewUrl} target="_blank" rel="noreferrer">
                   {doc.name}
                </a>
             </li>

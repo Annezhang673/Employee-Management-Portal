@@ -1,5 +1,6 @@
 import Application from "../models/application_model.js";
 import User from '../models/user_model.js';
+import { getSignedFileURL } from '../lib/s3.js';
 
 // 1. list all applications by status
 export async function listApplications(req, res) {
@@ -37,6 +38,18 @@ export async function getApplication(req, res) {
       .lean();
 
    if (!app) return res.status(404).json({ error: 'Not Found'});
+
+   const signedDocuments = await Promise.all(
+      app.documents.map(async (doc) => {
+         const { previewUrl, downloadUrl } = await getSignedFileURL(doc.s3Key);
+         return {
+            ...doc,
+            previewUrl,
+            downloadUrl,
+         };
+      })
+   );
+   app.documents = signedDocuments;
    res.json(app);
 }
 
