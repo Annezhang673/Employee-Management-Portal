@@ -1,23 +1,28 @@
-import { Router } from "express";
+import express from 'express';
+import { verifyToken } from "../middlewares/authMiddleware.js";
+import requireHR from "../middlewares/requireHR.js";
 import {
-  viewMyHousing,
-  viewAllHousing,
-  createNewHousing,
-  deleteHousing,
-} from "../controllers/housing-controller.js";
+  getAvailableHouses,
+  getMyHousing,
+  createHouse,
+  deleteHouse,
+  assignUserToHouse,
+  unassignUserFromHouse,
+  randomlyAssignUserToHouse,
+  getHouseResidents
+} from '../controllers/housing-controller.js';
 
-const router = Router();
+const router = express.Router();
 
-// Get api/housing/my, Employee can view assigned house and roommates
-router.get("/my", viewMyHousing);
+router.get('/available', verifyToken, getAvailableHouses); //working
+router.get('/user', verifyToken, getMyHousing); //working
 
-// Get api/housing, List all houses for HR
-router.get("/", viewAllHousing);
+router.post('/createHouse', verifyToken, requireHR, createHouse); //working
+router.delete('/:id', verifyToken, requireHR, deleteHouse); //works
+router.post('/:houseId/assign/:userId', verifyToken, requireHR, assignUserToHouse); //works
+router.post('/:houseId/unassign/:userId', verifyToken, requireHR, unassignUserFromHouse); //works
+router.get('/getResidents/:houseId', verifyToken, requireHR, getHouseResidents);
 
-//  Post api/housing, HR creates new house
-router.post("/", createNewHousing);
-
-//  Delete api/housing/:id, HR deletes house
-router.delete("/:houseId", deleteHousing);
+router.post('/initialAssignment', verifyToken, randomlyAssignUserToHouse) //works
 
 export default router;

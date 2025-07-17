@@ -11,6 +11,7 @@ import authRoutes from "./src/routes/auth-route.js";
 import userLoginRoutes from "./src/routes/login-route.js";
 import userRoutes from "./src/routes/user-route.js";
 import registrationTokenRoutes from "./src/routes/registrationToken-route.js";
+import facilityReportRoute from "./src/routes/facilityReport-route.js";
 import visaRouter from "./src/routes/visaRoute.js";
 
 const app = express();
@@ -28,6 +29,7 @@ app.use("/api/onboarding", onboardingRoutes);
 app.use("/api/users/", userRoutes);
 app.use("/api/visa", visaRouter);
 app.use("/api", userLoginRoutes);
+app.use("/api/report", facilityReportRoute)
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

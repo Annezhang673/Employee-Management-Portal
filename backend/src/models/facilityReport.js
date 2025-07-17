@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 import commentSchema from './subschemas/comment.js';
 
 const facilityReportSchema = new mongoose.Schema({
@@ -7,7 +7,8 @@ const facilityReportSchema = new mongoose.Schema({
    description: { type: String, required: true },
    author:      { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
    comments:    [commentSchema],
-   createdAt:   { type: Date, default: Date.now }
+   createdAt:   { type: Date, default: Date.now },
+   status:  { type: String, default: 'Open' }
 }, {
    timestamps: true
 });
