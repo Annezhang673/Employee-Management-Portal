@@ -6,22 +6,22 @@ const REQUIRED_STEPS = [
    {
       type:        "OPT Receipt",               
       submitText:  "Submit OPT Receipt",
-      waitingText: "Waiting for HR to approve your OPT Receipt",
+      waitingText: "Waiting for HR to approve the OPT Receipt",
    },
    {
       type:        "EAD",                     
       submitText:  "Please upload OPT EAD",
-      waitingText: "Waiting for HR to approve your OPT EAD",
+      waitingText: "Waiting for HR to approve the OPT EAD",
    },
    {
       type:        "I-983",                     
       submitText:  "Please upload your filled I-983",
-      waitingText: "Waiting for HR to approve and sign your I-983",
+      waitingText: "Waiting for HR to approve and sign the I-983",
    },
    {
       type:        "New I-20",                  
       submitText:  "Please upload your new I-20",
-      waitingText: "Waiting for HR to approve your I-20",
+      waitingText: "Waiting for HR to approve the I-20",
    },
 ];
 
