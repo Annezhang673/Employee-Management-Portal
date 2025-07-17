@@ -14,6 +14,7 @@ import {
   TextField,
 } from "@mui/material";
 import HouseDetailsModal from "./HouseDetailsModal";
+import axiosApi from "../../lib/axiosApi";
 
 interface Landlord {
   name: string;
@@ -55,39 +56,31 @@ const HousingManagementPage: React.FC = () => {
     facilities: { Beds: 0, Mattresses: 0, Tables: 0, Chairs: 0 },
   });
 
-  const token = localStorage.getItem("token");
+  //   const token = localStorage.getItem("token");
 
   const fetchHouses = useCallback(async () => {
     try {
-      const res = await axios.get("/api/housing/all", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axiosApi.get("/api/housing/all");
       setHouses(res.data);
     } catch (error) {
       console.error("Failed to fetch houses:", error);
     }
-  }, [token]);
+  }, []);
 
   const handleCreateHouse = async () => {
-    await axios.post("/api/housing/createHouse", formData, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    await axiosApi.post("/api/housing/createHouse", formData);
     setOpenForm(false);
     await fetchHouses();
   };
 
   const handleDeleteHouse = async (id: string) => {
-    await axios.delete(`/api/housing/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    await axiosApi.delete(`/api/housing/${id}`);
     await fetchHouses();
   };
 
   useEffect(() => {
     fetchHouses();
   }, [fetchHouses]);
-
-  console.log("houses", houses);
 
   return (
     <div style={{ padding: "2rem" }}>
