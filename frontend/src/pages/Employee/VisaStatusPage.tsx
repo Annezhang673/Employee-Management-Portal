@@ -23,30 +23,39 @@ export default function VisaStatusPage() {
   }, [dispatch]);
 
   useEffect(() => {
-    setStep(visaDocs.length);
+    setStep(visaDocs.length > 0 ? visaDocs.length : 1);
   }, [visaDocs]);
 
   const handleUpload = (file: File, docName: string) => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("name", docName);
-    try {
-      dispatch(uploadVisaDocument(formData));
-      toast.success("File uploaded successfully!");
-    } catch (error) {
-      console.error("Error uploading file:", error);
-      toast.error("Failed to upload file");
-    }
+
+    console.log("Uploading file:", file, "with doc name", docName);
+
+    dispatch(uploadVisaDocument(formData))
+      .unwrap()
+      .then(() => {
+        toast.success("File uploaded successfully!");
+      })
+      .catch((error) => {
+        console.error("Error uploading file:", error);
+        toast.error("Failed to upload file");
+      });
   };
 
   const handleSubmit = () => {
-    if (selectedFile) {
-      handleUpload(selectedFile, fileType[step - 1]);
-      setSelectedFile(null);
-    } else {
-      toast.error("Please select a file");
+    if (!selectedFile) {
+      toast.error("Please select a file to upload.");
       return;
     }
+    if (step < 1 || step > fileType.length) {
+      toast.error("Invalid step.");
+      return;
+    }
+
+    handleUpload(selectedFile, fileType[step - 1]);
+    setSelectedFile(null);
   };
 
   console.log("visaDocs", visaDocs);
@@ -73,15 +82,16 @@ export default function VisaStatusPage() {
       )}
 
       <div className="mb-3">
-        <p className={step >= 1 ? "text-secondary" : "text-muted"}>
-          Upload {fileType[step - 1]}
-        </p>
+        {step >= 1 && step <= fileType.length && (
+          <p className="fw-semibold">Upload {fileType[step - 1]}</p>
+        )}
 
         <div className="input-group">
           <input
             type="file"
             className="form-control"
-            onChange={(e) => setSelectedFile(e.target.files![0])}
+            onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+            disabled={step < 1 || step > fileType.length}
           />
 
           <button className="btn btn-primary" onClick={handleSubmit}>

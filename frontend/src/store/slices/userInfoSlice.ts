@@ -56,12 +56,11 @@ export const uploadVisaDocument = createAsyncThunk(
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      });
+      });      
 
       return response.data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.response.message);
-
     }
   }
 );
