@@ -12,7 +12,6 @@ const router = Router();
 router.post("/generate", generateAndSendToken);
 router.post("/validate/:token", validateToken);
 router.get("/status", viewTokenStatus);
-
 router.get("/check/:token", checkToken);
 
 export default router;

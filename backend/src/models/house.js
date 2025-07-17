@@ -6,8 +6,14 @@ const houseSchema = new mongoose.Schema({
       name:    { type: String },
       contact: { type: String }
    },
-   facilities: [String],
-   residents:  [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+   facilities: {
+      Beds: { type: Number },
+      Mattresses: { type: Number },
+      Tables: { type: Number },
+      Chairs: { type: Number }
+   },
+   residents:  [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+   available: { type: Boolean, default:true }
 }, {
    timestamps: true
 });
