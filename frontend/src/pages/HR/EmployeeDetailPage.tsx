@@ -82,7 +82,7 @@ export default function EmployeeDetailPage() {
       axiosApi
          .get<Employee>(`/api/users/${userId}`)
          .then((res) => {
-         setEmp(res.data);
+         setEmp(res.data);         
          setError(null);
          })
          .catch((err) => {
@@ -95,7 +95,7 @@ export default function EmployeeDetailPage() {
    if (error) return <div className="alert alert-danger">Error: {error}</div>;
    if (!emp) return <p>Employee not found.</p>;
 
-   const d = emp.application?.data;
+   const d = emp.application?.data;   
 
    return (
       <div className="container my-4">
