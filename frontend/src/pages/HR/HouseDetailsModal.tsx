@@ -54,6 +54,7 @@ interface HouseDetailsModalProps {
 
 interface Comment {
   description?: string;
+  text?: string;
   createdByName?: string;
   createdAt: string;
 }
@@ -120,7 +121,7 @@ const HouseDetailsModal: React.FC<HouseDetailsModalProps> = ({
 
   const handleStatusChange = async (reportId: string, status: string) => {
     await axiosApi.patch(`/api/report/${reportId}/status`, { status });
-    // await fetchReports();
+    await fetchReports();
   };
 
   const fetchResidents = useCallback(async () => {
@@ -142,7 +143,8 @@ const HouseDetailsModal: React.FC<HouseDetailsModalProps> = ({
     selectedPage * ITEMS_PER_PAGE
   );
 
-  console.log(facilityReports);
+  // console.log(facilityReports);
+  console.log(facilityReports[facilityReports.length - 1]?.comments);
 
   return (
     <Dialog open onClose={onClose} maxWidth="md" fullWidth>
@@ -205,26 +207,15 @@ const HouseDetailsModal: React.FC<HouseDetailsModalProps> = ({
             <Button onClick={() => handleStatusChange(report._id, "Closed")}>
               Closed
             </Button>
-            <Button onClick={() => fetchComments(report._id)}>
-              View Comments
-            </Button>
-
-            {/* {comments[report._id]?.map((c, idx) => (
-              <Typography key={idx} variant="body2" ml={2}>
-                - {c.description} by {c.createdByName || "User"} (
-                {new Date(c.createdAt).toLocaleString()})
-              </Typography>
-            ))} */}
 
             {facilityReports
               .find((r) => r._id === report._id)
               ?.comments?.map((c, idx) => (
                 <Typography key={idx} variant="body2" ml={2}>
-                  - {c.description} by {c.createdByName || "User"} (
+                  - {c.text} by {c.createdByName || "User"} (
                   {new Date(c.createdAt).toLocaleString()})
                 </Typography>
               ))}
-
             <TextField
               label="Add comment"
               fullWidth
@@ -236,10 +227,12 @@ const HouseDetailsModal: React.FC<HouseDetailsModalProps> = ({
                   [report._id]: e.target.value,
                 }))
               }
+              disabled={report.status === "Closed"}
             />
             <Button
               onClick={() => handleAddComment(report._id)}
               variant="outlined"
+              disabled={report.status === "Closed"}
             >
               Submit Comment
             </Button>
